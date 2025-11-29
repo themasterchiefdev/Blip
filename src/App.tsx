@@ -2,95 +2,21 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Search, Terminal, Copy, ExternalLink, Github, Check, Shuffle, Command, X, Menu, ArrowRight } from 'lucide-react';
 
 // --- DATA SOURCE ---
-const INITIAL_STATE = {
-  "meta": {
-    "version": "1.2",
-    "maintainer": "Open Source Community",
-    "security_warning": "DO NOT COMMIT SECRETS OR API KEYS"
-  },
-  "external_repos": [
-    {
-      "label": "Awesome Copilot",
-      "url": "https://github.com/github/awesome-copilot",
-      "icon": "Github"
-    }
-  ],
-  "items": [
-    {
-      "id": "CP-001",
-      "title": "Unit Test Generation",
-      "tool": "GitHub Copilot",
-      "category": "Utility",
-      "tags": ["Testing", "Python", "Quality"],
-      "content": "/tests Write a comprehensive pytest suite for the selected class. Include happy paths, edge cases (null/empty inputs), and mock external network calls."
-    },
-    {
-      "id": "CL-042",
-      "title": "System Architect Persona",
-      "tool": "Claude 3.5",
-      "category": "Persona",
-      "tags": ["Architecture", "Review"],
-      "content": "Act as a Principal Software Architect. Review the following code for: 1. Scalability bottlenecks, 2. Security flaws (OWASP), 3. Maintainability. Output as a markdown checklist."
-    },
-    {
-      "id": "GM-101",
-      "title": "Documentation Simplifier",
-      "tool": "Gemini",
-      "category": "Utility",
-      "tags": ["Docs", "Writing"],
-      "content": "Rewrite this technical documentation to be understood by a non-technical Product Manager. Remove jargon and use analogies."
-    },
-    {
-      "id": "CP-002",
-      "title": "ASP.NET Minimal API",
-      "tool": "GitHub Copilot",
-      "category": "Development",
-      "tags": ["ASP.NET", "API", "OpenAPI", "C#"],
-      "content": `---
-mode: 'agent'
-tools: ['changes', 'search/codebase', 'edit/editFiles', 'problems']
-description: 'Create ASP.NET Minimal API endpoints with proper OpenAPI documentation'
----
+import prompts from './data/prompts.json';
 
-# ASP.NET Minimal API with OpenAPI
-
-Your goal is to help me create well-structured ASP.NET Minimal API endpoints with correct types and comprehensive OpenAPI/Swagger documentation.
-
-## API Organization
-
-- Group related endpoints using \`MapGroup()\` extension
-- Use endpoint filters for cross-cutting concerns
-- Structure larger APIs with separate endpoint classes
-- Consider using a feature-based folder structure for complex APIs
-
-## Request and Response Types
-
-- Define explicit request and response DTOs/models
-- Create clear model classes with proper validation attributes
-- Use record types for immutable request/response objects
-- Use meaningful property names that align with API design standards
-- Apply \`[Required]\` and other validation attributes to enforce constraints
-- Use the ProblemDetailsService and StatusCodePages to get standard error responses
-
-## Type Handling
-
-- Use strongly-typed route parameters with explicit type binding
-- Use \`Results<T1, T2>\` to represent multiple response types
-- Return \`TypedResults\` instead of \`Results\` for strongly-typed responses
-- Leverage C# 10+ features like nullable annotations and init-only properties
-
-## OpenAPI Documentation
-
-- Use the built-in OpenAPI document support added in .NET 9
-- Define operation summary and description
-- Add operationIds using the \`WithName\` extension method
-- Add descriptions to properties and parameters with \`[Description()]\`
-- Set proper content types for requests and responses
-- Use document transformers to add elements like servers, tags, and security schemes
-- Use schema transformers to apply customizations to OpenAPI schemas`
-    }
-  ]
+const APP_META = {
+  version: "1.2",
+  maintainer: "Open Source Community",
+  security_warning: "DO NOT COMMIT SECRETS OR API KEYS"
 };
+
+const EXTERNAL_REPOS = [
+  {
+    label: "Awesome Copilot",
+    url: "https://github.com/github/awesome-copilot",
+    icon: "Github"
+  }
+];
 
 const CAT_MESSAGES = [
     "COME ON BRO, YOU CAME HERE FOR AI, NOT CATS.",
@@ -136,8 +62,8 @@ const IconMap = ({ name, size = 16, className = "" }: { name: string, size?: num
     }
 };
 
-const Sidebar = ({ items, activeFilter, setActiveFilter, externalRepos, className = "", onClose, onCoffeeClick, onLogoClick, coffeeStatus, xp }: { items: any[], activeFilter: string, setActiveFilter: (f: string) => void, externalRepos: any[], className?: string, onClose?: () => void, onCoffeeClick: () => void, onLogoClick: () => void, coffeeStatus: 'CRITICAL' | 'OPTIMAL', xp: number }) => {
-    const tools = ['All', ...Array.from(new Set(items.map(item => item.tool)))];
+const Sidebar = ({ activeFilter, setActiveFilter, externalRepos, className = "", onClose, onCoffeeClick, onLogoClick, coffeeStatus, xp }: { activeFilter: string, setActiveFilter: (f: string) => void, externalRepos: any[], className?: string, onClose?: () => void, onCoffeeClick: () => void, onLogoClick: () => void, coffeeStatus: 'CRITICAL' | 'OPTIMAL', xp: number }) => {
+    const tools = ['All', ...Array.from(new Set(prompts.map(item => item.tool)))];
     const currentRank = RANKS.slice().reverse().find(r => xp >= r.threshold) || RANKS[0];
     const nextRank = RANKS.find(r => r.threshold > xp);
     const progress = nextRank ? ((xp - currentRank.threshold) / (nextRank.threshold - currentRank.threshold)) * 100 : 100;
@@ -376,13 +302,13 @@ const LandingPage = ({ onEnter }: { onEnter: () => void }) => {
                         </span>
                     </button>
                 </div>
-                <p className="text-[10px] opacity-50">v{INITIAL_STATE.meta.version} // SECURE_CONNECTION_ESTABLISHED</p>
+                <p className="text-[10px] opacity-50">v{APP_META.version} // SECURE_CONNECTION_ESTABLISHED</p>
             </div>
         </div>
     );
 };
 
-import communityPrompts from './data/community_prompts.json';
+
 
 const App = () => {
     const [view, setView] = useState<'landing' | 'app'>('landing');
@@ -401,7 +327,7 @@ const App = () => {
     const [coffeeStatus, setCoffeeStatus] = useState<'CRITICAL' | 'OPTIMAL'>('CRITICAL');
     
     // Network State - Loaded from static JSON
-    const [networkItems] = useState<any[]>(communityPrompts);
+    const [items] = useState<any[]>(prompts);
 
     const searchInputRef = useRef<HTMLInputElement>(null);
     
@@ -493,7 +419,7 @@ const App = () => {
         setStatusText(statuses[nextIndex]);
     };
 
-    const allItems = useMemo(() => [...INITIAL_STATE.items, ...networkItems], [networkItems]);
+    const allItems = items;
 
     const filteredItems = allItems.filter(item => {
         const matchesFilter = activeFilter === 'All' || item.tool === activeFilter;
@@ -540,10 +466,10 @@ const App = () => {
             <div className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity md:hidden ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsMobileMenuOpen(false)}></div>
             <div className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform md:hidden ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <Sidebar 
-                    items={allItems}
+
                     activeFilter={activeFilter} 
                     setActiveFilter={setActiveFilter} 
-                    externalRepos={INITIAL_STATE.external_repos}
+                    externalRepos={EXTERNAL_REPOS}
                     onClose={() => setIsMobileMenuOpen(false)}
                     onCoffeeClick={handleCoffeeClick}
                     onLogoClick={handleLogoClick}
@@ -555,10 +481,10 @@ const App = () => {
 
             {/* Desktop Sidebar */}
             <Sidebar 
-                items={allItems}
+
                 activeFilter={activeFilter} 
                 setActiveFilter={setActiveFilter} 
-                externalRepos={INITIAL_STATE.external_repos} 
+                externalRepos={EXTERNAL_REPOS} 
                 onCoffeeClick={handleCoffeeClick}
                 onLogoClick={handleLogoClick}
                 coffeeStatus={coffeeStatus}

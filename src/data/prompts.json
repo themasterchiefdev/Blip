@@ -1,8 +1,55 @@
 [
   {
-    "id": "NET-1",
+    "id": "CP-001",
+    "title": "Unit Test Generation",
+    "tool": "GitHub Copilot",
+    "category": "Utility",
+    "tags": [
+      "Testing",
+      "Python",
+      "Quality"
+    ],
+    "content": "/tests Write a comprehensive pytest suite for the selected class. Include happy paths, edge cases (null/empty inputs), and mock external network calls."
+  },
+  {
+    "id": "CL-042",
+    "title": "System Architect Persona",
+    "tool": "Claude 3.5",
+    "category": "Persona",
+    "tags": [
+      "Architecture",
+      "Review"
+    ],
+    "content": "Act as a Principal Software Architect. Review the following code for: 1. Scalability bottlenecks, 2. Security flaws (OWASP), 3. Maintainability. Output as a markdown checklist."
+  },
+  {
+    "id": "GM-101",
+    "title": "Documentation Simplifier",
+    "tool": "Gemini",
+    "category": "Utility",
+    "tags": [
+      "Docs",
+      "Writing"
+    ],
+    "content": "Rewrite this technical documentation to be understood by a non-technical Product Manager. Remove jargon and use analogies."
+  },
+  {
+    "id": "CP-002",
+    "title": "ASP.NET Minimal API",
+    "tool": "GitHub Copilot",
+    "category": "Development",
+    "tags": [
+      "ASP.NET",
+      "API",
+      "OpenAPI",
+      "C#"
+    ],
+    "content": "---\nmode: 'agent'\ntools: ['changes', 'search/codebase', 'edit/editFiles', 'problems']\ndescription: 'Create ASP.NET Minimal API endpoints with proper OpenAPI documentation'\n---\n\n# ASP.NET Minimal API with OpenAPI\n\nYour goal is to help me create well-structured ASP.NET Minimal API endpoints with correct types and comprehensive OpenAPI/Swagger documentation.\n\n## API Organization\n\n- Group related endpoints using `MapGroup()` extension\n- Use endpoint filters for cross-cutting concerns\n- Structure larger APIs with separate endpoint classes\n- Consider using a feature-based folder structure for complex APIs\n\n## Request and Response Types\n\n- Define explicit request and response DTOs/models\n- Create clear model classes with proper validation attributes\n- Use record types for immutable request/response objects\n- Use meaningful property names that align with API design standards\n- Apply `[Required]` and other validation attributes to enforce constraints\n- Use the ProblemDetailsService and StatusCodePages to get standard error responses\n\n## Type Handling\n\n- Use strongly-typed route parameters with explicit type binding\n- Use `Results<T1, T2>` to represent multiple response types\n- Return `TypedResults` instead of `Results` for strongly-typed responses\n- Leverage C# 10+ features like nullable annotations and init-only properties\n\n## OpenAPI Documentation\n\n- Use the built-in OpenAPI document support added in .NET 9\n- Define operation summary and description\n- Add operationIds using the `WithName` extension method\n- Add descriptions to properties and parameters with `[Description()]`\n- Set proper content types for requests and responses\n- Use document transformers to add elements like servers, tags, and security schemes\n- Use schema transformers to apply customizations to OpenAPI schemas"
+  },
+  {
+    "id": "EXT-1",
     "title": "Add Educational Comments",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -12,9 +59,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/add-educational-comments.prompt.md"
   },
   {
-    "id": "NET-2",
+    "id": "EXT-2",
     "title": "AI Prompt Engineering Safety Review & Improvement",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -24,9 +71,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/ai-prompt-engineering-safety-review.prompt.md"
   },
   {
-    "id": "NET-3",
+    "id": "EXT-3",
     "title": "Comprehensive Project Architecture Blueprint Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -36,9 +83,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/architecture-blueprint-generator.prompt.md"
   },
   {
-    "id": "NET-4",
+    "id": "EXT-4",
     "title": "ASP.NET Minimal API with OpenAPI",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -48,9 +95,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/aspnet-minimal-api-openapi.prompt.md"
   },
   {
-    "id": "NET-5",
+    "id": "EXT-5",
     "title": "Azure Cost Optimize",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -60,9 +107,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/az-cost-optimize.prompt.md"
   },
   {
-    "id": "NET-6",
+    "id": "EXT-6",
     "title": "Azure Resource Health & Issue Diagnosis",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -72,9 +119,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/azure-resource-health-diagnose.prompt.md"
   },
   {
-    "id": "NET-7",
+    "id": "EXT-7",
     "title": "Boost Prompt",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -84,9 +131,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/boost-prompt.prompt.md"
   },
   {
-    "id": "NET-8",
+    "id": "EXT-8",
     "title": "Epic Architecture Specification Prompt",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -96,9 +143,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/breakdown-epic-arch.prompt.md"
   },
   {
-    "id": "NET-9",
+    "id": "EXT-9",
     "title": "Epic Product Requirements Document (PRD) Prompt",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -108,9 +155,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/breakdown-epic-pm.prompt.md"
   },
   {
-    "id": "NET-10",
+    "id": "EXT-10",
     "title": "Feature Implementation Plan Prompt",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -120,9 +167,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/breakdown-feature-implementation.prompt.md"
   },
   {
-    "id": "NET-11",
+    "id": "EXT-11",
     "title": "Feature PRD Prompt",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -132,9 +179,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/breakdown-feature-prd.prompt.md"
   },
   {
-    "id": "NET-12",
+    "id": "EXT-12",
     "title": "GitHub Issue Planning & Project Automation Prompt",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -144,9 +191,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/breakdown-plan.prompt.md"
   },
   {
-    "id": "NET-13",
+    "id": "EXT-13",
     "title": "Test Planning & Quality Assurance Prompt",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -156,9 +203,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/breakdown-test.prompt.md"
   },
   {
-    "id": "NET-14",
+    "id": "EXT-14",
     "title": "Code Exemplars Blueprint Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -168,9 +215,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/code-exemplars-blueprint-generator.prompt.md"
   },
   {
-    "id": "NET-15",
+    "id": "EXT-15",
     "title": "Comment Code Generate A Tutorial",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -180,9 +227,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/comment-code-generate-a-tutorial.prompt.md"
   },
   {
-    "id": "NET-16",
+    "id": "EXT-16",
     "title": "ASP.NET .NET Framework Containerization Prompt",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -192,9 +239,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/containerize-aspnet-framework.prompt.md"
   },
   {
-    "id": "NET-17",
+    "id": "EXT-17",
     "title": "ASP.NET Core Docker Containerization Prompt",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -204,9 +251,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/containerize-aspnetcore.prompt.md"
   },
   {
-    "id": "NET-18",
+    "id": "EXT-18",
     "title": "Conventional Commit",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -216,9 +263,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/conventional-commit.prompt.md"
   },
   {
-    "id": "NET-19",
+    "id": "EXT-19",
     "title": "Copilot Instructions Blueprint Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -228,9 +275,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/copilot-instructions-blueprint-generator.prompt.md"
   },
   {
-    "id": "NET-20",
+    "id": "EXT-20",
     "title": "Azure Cosmos DB NoSQL Data Modeling Expert System Prompt",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -240,9 +287,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/cosmosdb-datamodeling.prompt.md"
   },
   {
-    "id": "NET-21",
+    "id": "EXT-21",
     "title": "Create high‑quality AGENTS.md file",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -252,9 +299,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-agentsmd.prompt.md"
   },
   {
-    "id": "NET-22",
+    "id": "EXT-22",
     "title": "Create Architectural Decision Record",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -264,9 +311,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-architectural-decision-record.prompt.md"
   },
   {
-    "id": "NET-23",
+    "id": "EXT-23",
     "title": "Create GitHub Actions Workflow Specification",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -276,9 +323,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-github-action-workflow-specification.prompt.md"
   },
   {
-    "id": "NET-24",
+    "id": "EXT-24",
     "title": "Create GitHub Issue from Specification",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -288,9 +335,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-github-issue-feature-from-specification.prompt.md"
   },
   {
-    "id": "NET-25",
+    "id": "EXT-25",
     "title": "Create GitHub Issue from Implementation Plan",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -300,9 +347,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-github-issues-feature-from-implementation-plan.prompt.md"
   },
   {
-    "id": "NET-26",
+    "id": "EXT-26",
     "title": "Create GitHub Issues for Unmet Specification Requirements",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -312,9 +359,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-github-issues-for-unmet-specification-requirements.prompt.md"
   },
   {
-    "id": "NET-27",
+    "id": "EXT-27",
     "title": "Create GitHub Pull Request from Specification",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -324,9 +371,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-github-pull-request-from-specification.prompt.md"
   },
   {
-    "id": "NET-28",
+    "id": "EXT-28",
     "title": "Create Implementation Plan",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -336,9 +383,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-implementation-plan.prompt.md"
   },
   {
-    "id": "NET-29",
+    "id": "EXT-29",
     "title": "Create LLMs.txt File from Repository Structure",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -348,9 +395,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-llms.prompt.md"
   },
   {
-    "id": "NET-30",
+    "id": "EXT-30",
     "title": "Generate Standard OO Component Documentation",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -360,9 +407,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-oo-component-documentation.prompt.md"
   },
   {
-    "id": "NET-31",
+    "id": "EXT-31",
     "title": "Create Readme",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -372,9 +419,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-readme.prompt.md"
   },
   {
-    "id": "NET-32",
+    "id": "EXT-32",
     "title": "Create Specification",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -384,9 +431,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-specification.prompt.md"
   },
   {
-    "id": "NET-33",
+    "id": "EXT-33",
     "title": "Create Spring Boot Java project prompt",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -396,9 +443,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-spring-boot-java-project.prompt.md"
   },
   {
-    "id": "NET-34",
+    "id": "EXT-34",
     "title": "Create Spring Boot Kotlin project prompt",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -408,9 +455,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-spring-boot-kotlin-project.prompt.md"
   },
   {
-    "id": "NET-35",
+    "id": "EXT-35",
     "title": "Create Technical Spike Document",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -420,9 +467,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/create-technical-spike.prompt.md"
   },
   {
-    "id": "NET-36",
+    "id": "EXT-36",
     "title": "C# Async Programming Best Practices",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -432,9 +479,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/csharp-async.prompt.md"
   },
   {
-    "id": "NET-37",
+    "id": "EXT-37",
     "title": "C# Documentation Best Practices",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -444,9 +491,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/csharp-docs.prompt.md"
   },
   {
-    "id": "NET-38",
+    "id": "EXT-38",
     "title": "Generate C# MCP Server",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -456,9 +503,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/csharp-mcp-server-generator.prompt.md"
   },
   {
-    "id": "NET-39",
+    "id": "EXT-39",
     "title": "MSTest Best Practices",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -468,9 +515,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/csharp-mstest.prompt.md"
   },
   {
-    "id": "NET-40",
+    "id": "EXT-40",
     "title": "NUnit Best Practices",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -480,9 +527,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/csharp-nunit.prompt.md"
   },
   {
-    "id": "NET-41",
+    "id": "EXT-41",
     "title": "TUnit Best Practices",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -492,9 +539,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/csharp-tunit.prompt.md"
   },
   {
-    "id": "NET-42",
+    "id": "EXT-42",
     "title": "XUnit Best Practices",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -504,9 +551,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/csharp-xunit.prompt.md"
   },
   {
-    "id": "NET-43",
+    "id": "EXT-43",
     "title": "Microsoft 365 Declarative Agents Development Kit",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -516,9 +563,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/declarative-agents.prompt.md"
   },
   {
-    "id": "NET-44",
+    "id": "EXT-44",
     "title": "Diátaxis Documentation Expert",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -528,9 +575,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/documentation-writer.prompt.md"
   },
   {
-    "id": "NET-45",
+    "id": "EXT-45",
     "title": ".NET/C# Best Practices",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -540,9 +587,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/dotnet-best-practices.prompt.md"
   },
   {
-    "id": "NET-46",
+    "id": "EXT-46",
     "title": ".NET/C# Design Pattern Review",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -552,9 +599,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/dotnet-design-pattern-review.prompt.md"
   },
   {
-    "id": "NET-47",
+    "id": "EXT-47",
     "title": "Dotnet Upgrade",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -564,9 +611,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/dotnet-upgrade.prompt.md"
   },
   {
-    "id": "NET-48",
+    "id": "EXT-48",
     "title": ".editorconfig",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -576,9 +623,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/editorconfig.prompt.md"
   },
   {
-    "id": "NET-49",
+    "id": "EXT-49",
     "title": "Entity Framework Core Best Practices",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -588,9 +635,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/ef-core.prompt.md"
   },
   {
-    "id": "NET-50",
+    "id": "EXT-50",
     "title": "Finalize Agent Prompt",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -600,9 +647,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/finalize-agent-prompt.prompt.md"
   },
   {
-    "id": "NET-51",
+    "id": "EXT-51",
     "title": "Act Informed: First understand together with the human, then do",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -612,9 +659,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/first-ask.prompt.md"
   },
   {
-    "id": "NET-52",
+    "id": "EXT-52",
     "title": "Project Folder Structure Blueprint Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -624,9 +671,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/folder-structure-blueprint-generator.prompt.md"
   },
   {
-    "id": "NET-53",
+    "id": "EXT-53",
     "title": "Product Manager Assistant: Feature Identification and Specification",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -636,9 +683,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/gen-specs-as-issues.prompt.md"
   },
   {
-    "id": "NET-54",
+    "id": "EXT-54",
     "title": "Migration and Code Evolution Instructions Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -648,9 +695,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/generate-custom-instructions-from-codebase.prompt.md"
   },
   {
-    "id": "NET-55",
+    "id": "EXT-55",
     "title": "Git Flow Branch Creator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -660,9 +707,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/git-flow-branch-creator.prompt.md"
   },
   {
-    "id": "NET-56",
+    "id": "EXT-56",
     "title": "React Development Guidelines",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -672,9 +719,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/github-copilot-starter.prompt.md"
   },
   {
-    "id": "NET-57",
+    "id": "EXT-57",
     "title": "Go MCP Server Project Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -684,9 +731,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/go-mcp-server-generator.prompt.md"
   },
   {
-    "id": "NET-58",
+    "id": "EXT-58",
     "title": "Java Documentation (Javadoc) Best Practices",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -696,9 +743,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/java-docs.prompt.md"
   },
   {
-    "id": "NET-59",
+    "id": "EXT-59",
     "title": "JUnit 5+ Best Practices",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -708,9 +755,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/java-junit.prompt.md"
   },
   {
-    "id": "NET-60",
+    "id": "EXT-60",
     "title": "Java MCP Server Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -720,9 +767,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/java-mcp-server-generator.prompt.md"
   },
   {
-    "id": "NET-61",
+    "id": "EXT-61",
     "title": "Refactoring Java Methods with Extract Method",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -732,9 +779,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/java-refactoring-extract-method.prompt.md"
   },
   {
-    "id": "NET-62",
+    "id": "EXT-62",
     "title": "Refactoring Java Methods with Remove Parameter",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -744,9 +791,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/java-refactoring-remove-parameter.prompt.md"
   },
   {
-    "id": "NET-63",
+    "id": "EXT-63",
     "title": "Spring Boot Best Practices",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -756,9 +803,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/java-springboot.prompt.md"
   },
   {
-    "id": "NET-64",
+    "id": "EXT-64",
     "title": "Javascript Typescript Jest",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -768,9 +815,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/javascript-typescript-jest.prompt.md"
   },
   {
-    "id": "NET-65",
+    "id": "EXT-65",
     "title": "Kotlin MCP Server Project Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -780,9 +827,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/kotlin-mcp-server-generator.prompt.md"
   },
   {
-    "id": "NET-66",
+    "id": "EXT-66",
     "title": "Spring Boot with Kotlin Best Practices",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -792,9 +839,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/kotlin-springboot.prompt.md"
   },
   {
-    "id": "NET-67",
+    "id": "EXT-67",
     "title": "Power Platform MCP Connector Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -804,9 +851,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/mcp-copilot-studio-server-generator.prompt.md"
   },
   {
-    "id": "NET-68",
+    "id": "EXT-68",
     "title": "Memory Merger",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -816,9 +863,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/memory-merger.prompt.md"
   },
   {
-    "id": "NET-69",
+    "id": "EXT-69",
     "title": "MkDocs AI Translator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -828,9 +875,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/mkdocs-translations.prompt.md"
   },
   {
-    "id": "NET-70",
+    "id": "EXT-70",
     "title": "AI Model Recommendation for Copilot Chat Modes and Prompts",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -840,9 +887,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/model-recommendation.prompt.md"
   },
   {
-    "id": "NET-71",
+    "id": "EXT-71",
     "title": "Multi Stage Dockerfile",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -852,9 +899,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/multi-stage-dockerfile.prompt.md"
   },
   {
-    "id": "NET-72",
+    "id": "EXT-72",
     "title": "My Issues",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -864,9 +911,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/my-issues.prompt.md"
   },
   {
-    "id": "NET-73",
+    "id": "EXT-73",
     "title": "My Pull Requests",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -876,9 +923,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/my-pull-requests.prompt.md"
   },
   {
-    "id": "NET-74",
+    "id": "EXT-74",
     "title": "Next Intl Add Language",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -888,9 +935,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/next-intl-add-language.prompt.md"
   },
   {
-    "id": "NET-75",
+    "id": "EXT-75",
     "title": "PHP MCP Server Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -900,9 +947,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/php-mcp-server-generator.prompt.md"
   },
   {
-    "id": "NET-76",
+    "id": "EXT-76",
     "title": "Automating Filling in a Form with Playwright MCP",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -912,9 +959,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/playwright-automation-fill-in-form.prompt.md"
   },
   {
-    "id": "NET-77",
+    "id": "EXT-77",
     "title": "Website Exploration for Testing",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -924,9 +971,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/playwright-explore-website.prompt.md"
   },
   {
-    "id": "NET-78",
+    "id": "EXT-78",
     "title": "Test Generation with Playwright MCP",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -936,9 +983,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/playwright-generate-test.prompt.md"
   },
   {
-    "id": "NET-79",
+    "id": "EXT-79",
     "title": "PostgreSQL Code Review Assistant",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -948,9 +995,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/postgresql-code-review.prompt.md"
   },
   {
-    "id": "NET-80",
+    "id": "EXT-80",
     "title": "PostgreSQL Development Assistant",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -960,9 +1007,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/postgresql-optimization.prompt.md"
   },
   {
-    "id": "NET-81",
+    "id": "EXT-81",
     "title": "Power Apps Code Apps Project Scaffolding",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -972,9 +1019,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/power-apps-code-app-scaffold.prompt.md"
   },
   {
-    "id": "NET-82",
+    "id": "EXT-82",
     "title": "Power BI DAX Formula Optimizer",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -984,9 +1031,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/power-bi-dax-optimization.prompt.md"
   },
   {
-    "id": "NET-83",
+    "id": "EXT-83",
     "title": "Power BI Data Model Design Review",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -996,9 +1043,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/power-bi-model-design-review.prompt.md"
   },
   {
-    "id": "NET-84",
+    "id": "EXT-84",
     "title": "Power BI Performance Troubleshooting Guide",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1008,9 +1055,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/power-bi-performance-troubleshooting.prompt.md"
   },
   {
-    "id": "NET-85",
+    "id": "EXT-85",
     "title": "Power BI Report Visualization Designer",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1020,9 +1067,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/power-bi-report-design-consultation.prompt.md"
   },
   {
-    "id": "NET-86",
+    "id": "EXT-86",
     "title": "Power Platform MCP Connector Suite",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1032,9 +1079,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/power-platform-mcp-connector-suite.prompt.md"
   },
   {
-    "id": "NET-87",
+    "id": "EXT-87",
     "title": "Project Workflow Documentation Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1044,9 +1091,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/project-workflow-analysis-blueprint-generator.prompt.md"
   },
   {
-    "id": "NET-88",
+    "id": "EXT-88",
     "title": "Professional Prompt Builder",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1056,9 +1103,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/prompt-builder.prompt.md"
   },
   {
-    "id": "NET-89",
+    "id": "EXT-89",
     "title": "Pytest Coverage",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1068,9 +1115,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/pytest-coverage.prompt.md"
   },
   {
-    "id": "NET-90",
+    "id": "EXT-90",
     "title": "Generate Python MCP Server",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1080,9 +1127,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/python-mcp-server-generator.prompt.md"
   },
   {
-    "id": "NET-91",
+    "id": "EXT-91",
     "title": "README Generator Prompt",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1092,9 +1139,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/readme-blueprint-generator.prompt.md"
   },
   {
-    "id": "NET-92",
+    "id": "EXT-92",
     "title": "Remember Interactive Programming",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1104,9 +1151,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/remember-interactive-programming.prompt.md"
   },
   {
-    "id": "NET-93",
+    "id": "EXT-93",
     "title": "Memory Keeper",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1116,9 +1163,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/remember.prompt.md"
   },
   {
-    "id": "NET-94",
+    "id": "EXT-94",
     "title": "Repository Analysis: [Repo Name]",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1128,9 +1175,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/repo-story-time.prompt.md"
   },
   {
-    "id": "NET-95",
+    "id": "EXT-95",
     "title": "Review And Refactor",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1140,9 +1187,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/review-and-refactor.prompt.md"
   },
   {
-    "id": "NET-96",
+    "id": "EXT-96",
     "title": "Ruby MCP Server Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1152,9 +1199,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/ruby-mcp-server-generator.prompt.md"
   },
   {
-    "id": "NET-97",
+    "id": "EXT-97",
     "title": "Rust MCP Server Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1164,9 +1211,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/rust-mcp-server-generator.prompt.md"
   },
   {
-    "id": "NET-98",
+    "id": "EXT-98",
     "title": "Shuffle JSON Data",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1176,9 +1223,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/shuffle-json-data.prompt.md"
   },
   {
-    "id": "NET-99",
+    "id": "EXT-99",
     "title": "SQL Code Review",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1188,9 +1235,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/sql-code-review.prompt.md"
   },
   {
-    "id": "NET-100",
+    "id": "EXT-100",
     "title": "SQL Performance Optimization Assistant",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1200,9 +1247,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/sql-optimization.prompt.md"
   },
   {
-    "id": "NET-101",
+    "id": "EXT-101",
     "title": "Suggest Awesome GitHub Copilot Custom Agents",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1212,9 +1259,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/suggest-awesome-github-copilot-agents.prompt.md"
   },
   {
-    "id": "NET-102",
+    "id": "EXT-102",
     "title": "Suggest Awesome GitHub Copilot Custom Chat Modes",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1224,9 +1271,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/suggest-awesome-github-copilot-chatmodes.prompt.md"
   },
   {
-    "id": "NET-103",
+    "id": "EXT-103",
     "title": "Suggest Awesome GitHub Copilot Collections",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1236,9 +1283,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/suggest-awesome-github-copilot-collections.prompt.md"
   },
   {
-    "id": "NET-104",
+    "id": "EXT-104",
     "title": "Suggest Awesome GitHub Copilot Instructions",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1248,9 +1295,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/suggest-awesome-github-copilot-instructions.prompt.md"
   },
   {
-    "id": "NET-105",
+    "id": "EXT-105",
     "title": "Suggest Awesome GitHub Copilot Prompts",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1260,9 +1307,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/suggest-awesome-github-copilot-prompts.prompt.md"
   },
   {
-    "id": "NET-106",
+    "id": "EXT-106",
     "title": "Swift MCP Server Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1272,9 +1319,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/swift-mcp-server-generator.prompt.md"
   },
   {
-    "id": "NET-107",
+    "id": "EXT-107",
     "title": "Comprehensive Technology Stack Blueprint Generator",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1284,9 +1331,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/technology-stack-blueprint-generator.prompt.md"
   },
   {
-    "id": "NET-108",
+    "id": "EXT-108",
     "title": "Generate TypeScript MCP Server",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1296,9 +1343,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/typescript-mcp-server-generator.prompt.md"
   },
   {
-    "id": "NET-109",
+    "id": "EXT-109",
     "title": "Update Azure Verified Modules in Bicep Files",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1308,9 +1355,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/update-avm-modules-in-bicep.prompt.md"
   },
   {
-    "id": "NET-110",
+    "id": "EXT-110",
     "title": "Update Implementation Plan",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1320,9 +1367,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/update-implementation-plan.prompt.md"
   },
   {
-    "id": "NET-111",
+    "id": "EXT-111",
     "title": "Update LLMs.txt File",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1332,9 +1379,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/update-llms.prompt.md"
   },
   {
-    "id": "NET-112",
+    "id": "EXT-112",
     "title": "Update Markdown File Index",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1344,9 +1391,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/update-markdown-file-index.prompt.md"
   },
   {
-    "id": "NET-113",
+    "id": "EXT-113",
     "title": "Update Standard OO Component Documentation",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1356,9 +1403,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/update-oo-component-documentation.prompt.md"
   },
   {
-    "id": "NET-114",
+    "id": "EXT-114",
     "title": "Update Specification",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",
@@ -1368,9 +1415,9 @@
     "original_url": "https://github.com/github/awesome-copilot/blob/main/prompts/update-specification.prompt.md"
   },
   {
-    "id": "NET-115",
+    "id": "EXT-115",
     "title": "Write Coding Standards From File",
-    "tool": "COMMUNITY",
+    "tool": "GitHub Copilot",
     "category": "External",
     "tags": [
       "GitHub",

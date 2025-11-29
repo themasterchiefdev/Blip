@@ -1,0 +1,34 @@
+[
+    {
+      "id": "CP-001",
+      "title": "Unit Test Generation",
+      "tool": "GitHub Copilot",
+      "category": "Utility",
+      "tags": ["Testing", "Python", "Quality"],
+      "content": "/tests Write a comprehensive pytest suite for the selected class. Include happy paths, edge cases (null/empty inputs), and mock external network calls."
+    },
+    {
+      "id": "CL-042",
+      "title": "System Architect Persona",
+      "tool": "Claude 3.5",
+      "category": "Persona",
+      "tags": ["Architecture", "Review"],
+      "content": "Act as a Principal Software Architect. Review the following code for: 1. Scalability bottlenecks, 2. Security flaws (OWASP), 3. Maintainability. Output as a markdown checklist."
+    },
+    {
+      "id": "GM-101",
+      "title": "Documentation Simplifier",
+      "tool": "Gemini",
+      "category": "Utility",
+      "tags": ["Docs", "Writing"],
+      "content": "Rewrite this technical documentation to be understood by a non-technical Product Manager. Remove jargon and use analogies."
+    },
+    {
+      "id": "CP-002",
+      "title": "ASP.NET Minimal API",
+      "tool": "GitHub Copilot",
+      "category": "Development",
+      "tags": ["ASP.NET", "API", "OpenAPI", "C#"],
+      "content": "---\nmode: 'agent'\ntools: ['changes', 'search/codebase', 'edit/editFiles', 'problems']\ndescription: 'Create ASP.NET Minimal API endpoints with proper OpenAPI documentation'\n---\n\n# ASP.NET Minimal API with OpenAPI\n\nYour goal is to help me create well-structured ASP.NET Minimal API endpoints with correct types and comprehensive OpenAPI/Swagger documentation.\n\n## API Organization\n\n- Group related endpoints using `MapGroup()` extension\n- Use endpoint filters for cross-cutting concerns\n- Structure larger APIs with separate endpoint classes\n- Consider using a feature-based folder structure for complex APIs\n\n## Request and Response Types\n\n- Define explicit request and response DTOs/models\n- Create clear model classes with proper validation attributes\n- Use record types for immutable request/response objects\n- Use meaningful property names that align with API design standards\n- Apply `[Required]` and other validation attributes to enforce constraints\n- Use the ProblemDetailsService and StatusCodePages to get standard error responses\n\n## Type Handling\n\n- Use strongly-typed route parameters with explicit type binding\n- Use `Results<T1, T2>` to represent multiple response types\n- Return `TypedResults` instead of `Results` for strongly-typed responses\n- Leverage C# 10+ features like nullable annotations and init-only properties\n\n## OpenAPI Documentation\n\n- Use the built-in OpenAPI document support added in .NET 9\n- Define operation summary and description\n- Add operationIds using the `WithName` extension method\n- Add descriptions to properties and parameters with `[Description()]`\n- Set proper content types for requests and responses\n- Use document transformers to add elements like servers, tags, and security schemes\n- Use schema transformers to apply customizations to OpenAPI schemas"
+    }
+]

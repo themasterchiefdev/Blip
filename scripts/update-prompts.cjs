@@ -3,7 +3,8 @@ const path = require('path');
 const https = require('https');
 
 const GITHUB_API_URL = 'https://api.github.com/repos/github/awesome-copilot/contents/prompts';
-const OUTPUT_FILE = path.join(__dirname, '../src/data/community_prompts.json');
+const LOCAL_PROMPTS_FILE = path.join(__dirname, '../src/data/local_prompts.json');
+const OUTPUT_FILE = path.join(__dirname, '../src/data/prompts.json');
 const USER_AGENT = 'Blip-App-Build-Script';
 
 // Helper to make HTTPS requests
@@ -24,10 +25,20 @@ const fetchUrl = (url) => {
 };
 
 async function main() {
-    console.log('🚀 Starting Community Prompts Update...');
+    console.log('🚀 Starting Prompts Update...');
 
     try {
-        // 1. Fetch File List
+        // 1. Load Local Prompts
+        console.log('📂 Loading local prompts...');
+        let localPrompts = [];
+        if (fs.existsSync(LOCAL_PROMPTS_FILE)) {
+            localPrompts = JSON.parse(fs.readFileSync(LOCAL_PROMPTS_FILE, 'utf8'));
+            console.log(`✅ Loaded ${localPrompts.length} local prompts.`);
+        } else {
+            console.warn('⚠️ Local prompts file not found.');
+        }
+
+        // 2. Fetch File List from GitHub
         console.log('📦 Fetching file list from GitHub...');
         const listData = await fetchUrl(GITHUB_API_URL);
         const files = JSON.parse(listData);
@@ -35,9 +46,9 @@ async function main() {
         const promptFiles = files.filter(f => f.name.endsWith('.prompt.md'));
         console.log(`Found ${promptFiles.length} prompt files.`);
 
-        const prompts = [];
+        const externalPrompts = [];
 
-        // 2. Fetch Content for each file
+        // 3. Fetch Content for each file
         for (const [index, file] of promptFiles.entries()) {
             process.stdout.write(`\r⬇️  Downloading ${index + 1}/${promptFiles.length}: ${file.name}...`);
             
@@ -50,10 +61,10 @@ async function main() {
             // Clean Content (remove frontmatter)
             const content = rawContent.replace(/^---[\s\S]*?---\n/, '');
 
-            prompts.push({
-                id: `NET-${index + 1}`,
+            externalPrompts.push({
+                id: `EXT-${index + 1}`,
                 title: title,
-                tool: 'COMMUNITY',
+                tool: 'GitHub Copilot', // As requested by user
                 category: 'External',
                 tags: ['GitHub', 'OpenSource'],
                 content: content,
@@ -66,14 +77,19 @@ async function main() {
 
         console.log('\n✅ Download complete.');
 
-        // 3. Save to JSON
+        // 4. Merge and Save
+        const allPrompts = [...localPrompts, ...externalPrompts];
+        
+        // Deduplicate by title (simple strategy)
+        const uniquePrompts = Array.from(new Map(allPrompts.map(item => [item.title, item])).values());
+
         const outputDir = path.dirname(OUTPUT_FILE);
         if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, { recursive: true });
         }
 
-        fs.writeFileSync(OUTPUT_FILE, JSON.stringify(prompts, null, 2));
-        console.log(`💾 Saved ${prompts.length} prompts to ${OUTPUT_FILE}`);
+        fs.writeFileSync(OUTPUT_FILE, JSON.stringify(uniquePrompts, null, 2));
+        console.log(`💾 Saved ${uniquePrompts.length} consolidated prompts to ${OUTPUT_FILE}`);
 
     } catch (error) {
         console.error('\n❌ Error updating prompts:', error.message);
