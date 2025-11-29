@@ -136,7 +136,7 @@ const IconMap = ({ name, size = 16, className = "" }: { name: string, size?: num
     }
 };
 
-const Sidebar = ({ items, activeFilter, setActiveFilter, externalRepos, className = "", onClose, onCoffeeClick, onLogoClick, coffeeStatus, xp, isLoadingNetwork }: { items: any[], activeFilter: string, setActiveFilter: (f: string) => void, externalRepos: any[], className?: string, onClose?: () => void, onCoffeeClick: () => void, onLogoClick: () => void, coffeeStatus: 'CRITICAL' | 'OPTIMAL', xp: number, isLoadingNetwork?: boolean }) => {
+const Sidebar = ({ items, activeFilter, setActiveFilter, externalRepos, className = "", onClose, onCoffeeClick, onLogoClick, coffeeStatus, xp }: { items: any[], activeFilter: string, setActiveFilter: (f: string) => void, externalRepos: any[], className?: string, onClose?: () => void, onCoffeeClick: () => void, onLogoClick: () => void, coffeeStatus: 'CRITICAL' | 'OPTIMAL', xp: number }) => {
     const tools = ['All', ...Array.from(new Set(items.map(item => item.tool)))];
     const currentRank = RANKS.slice().reverse().find(r => xp >= r.threshold) || RANKS[0];
     const nextRank = RANKS.find(r => r.threshold > xp);
@@ -174,7 +174,6 @@ const Sidebar = ({ items, activeFilter, setActiveFilter, externalRepos, classNam
                                     }`}
                             >
                                 {tool === 'All' ? 'EVERYTHING' : tool.toUpperCase()}
-                                {tool === 'COMMUNITY' && isLoadingNetwork && <span className="ml-2 animate-spin inline-block">⏳</span>}
                             </button>
                         ))}
                     </div>
@@ -383,7 +382,9 @@ const LandingPage = ({ onEnter }: { onEnter: () => void }) => {
     );
 };
 
-function App() {
+import communityPrompts from './data/community_prompts.json';
+
+const App = () => {
     const [view, setView] = useState<'landing' | 'app'>('landing');
     const [activeFilter, setActiveFilter] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
@@ -399,13 +400,10 @@ function App() {
     const [unlockedBadges, setUnlockedBadges] = useState<string[]>([]);
     const [coffeeStatus, setCoffeeStatus] = useState<'CRITICAL' | 'OPTIMAL'>('CRITICAL');
     
-    // Network State
-    const [networkItems, setNetworkItems] = useState<any[]>([]);
-    const [isLoadingNetwork, setIsLoadingNetwork] = useState(false);
-    const [fetchQueue, setFetchQueue] = useState<any[]>([]);
+    // Network State - Loaded from static JSON
+    const [networkItems] = useState<any[]>(communityPrompts);
 
     const searchInputRef = useRef<HTMLInputElement>(null);
-    const CACHE_KEY = 'BLIP_CACHE_V1';
     
     const unlockBadge = (badge: string) => {
         if (!unlockedBadges.includes(badge)) {
@@ -414,155 +412,16 @@ function App() {
         }
     };
 
-    const LOADING_MESSAGES = [
-        "DOWNLOADING KNOWLEDGE...",
-        "CONVINCING SERVER...",
-        "DECRYPTING SCROLLS...",
-        "EXCHANGING PACKETS...",
-        "PLEASE WAIT...",
-        "REVERSING POLARITY...",
-        "COMPILING WISDOM...",
-        "ASKING ORACLE...",
-        "GENERATING WIT...",
-        "BUFFERING INTERNET..."
-    ];
-
-    // Load from cache and fetch list
-    useEffect(() => {
-        const initNetworkItems = async () => {
-            setIsLoadingNetwork(true);
-            try {
-                // 1. Load from cache
-                const cachedData = localStorage.getItem(CACHE_KEY);
-                const cache = cachedData ? JSON.parse(cachedData) : {};
-                
-                // 2. Fetch list from GitHub
-                const response = await fetch('https://api.github.com/repos/github/awesome-copilot/contents/prompts');
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                
-                const items: any[] = [];
-                const newQueue: any[] = [];
-
-                data.filter((file: any) => file.name.endsWith('.prompt.md'))
-                    .forEach((file: any, index: number) => {
-                        const id = `NET-${index + 1}`;
-                        const cachedItem = cache[id];
-                        
-                        // Check if we have a valid cached version
-                        if (cachedItem && cachedItem.sha === file.sha && cachedItem.content) {
-                            items.push({
-                                ...cachedItem,
-                                isLoaded: true,
-                                download_url: file.download_url // Update URL just in case
-                            });
-                        } else {
-                            // Needs update
-                            const newItem = {
-                                id,
-                                title: file.name.replace(/-/g, ' ').replace('.prompt.md', '').replace(/\b\w/g, (l: string) => l.toUpperCase()),
-                                tool: 'COMMUNITY',
-                                category: 'External',
-                                tags: ['GitHub', 'OpenSource'],
-                                content: LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)],
-                                download_url: file.download_url,
-                                sha: file.sha,
-                                isLoaded: false
-                            };
-                            items.push(newItem);
-                            newQueue.push(newItem);
-                        }
-                    });
-                
-                setNetworkItems(items);
-                setFetchQueue(newQueue);
-            } catch (error) {
-                console.error('Failed to init network items:', error);
-                setToastMessage("ERROR: FAILED_TO_SYNC_COMMUNITY_PROMPTS");
-                
-                // Fallback to cache if network fails
-                const cachedData = localStorage.getItem(CACHE_KEY);
-                if (cachedData) {
-                    const cache = JSON.parse(cachedData);
-                    setNetworkItems(Object.values(cache));
-                }
-            } finally {
-                setIsLoadingNetwork(false);
-            }
-        };
-
-        initNetworkItems();
-    }, []);
-
-    // Background Fetch Queue Processor
-    useEffect(() => {
-        if (fetchQueue.length === 0) return;
-
-        const processQueue = async () => {
-            const itemToFetch = fetchQueue[0];
-            
-            try {
-                const response = await fetch(itemToFetch.download_url);
-                if (!response.ok) throw new Error(`Failed to fetch ${itemToFetch.title}`);
-                const text = await response.text();
-                
-                // Extract title from first H1 if present
-                const h1Match = text.match(/^#\s+(.+)$/m);
-                const title = h1Match ? h1Match[1] : itemToFetch.title;
-                
-                // Remove frontmatter if present
-                const content = text.replace(/^---[\s\S]*?---\n/, '');
-
-                const updatedItem = {
-                    ...itemToFetch,
-                    title,
-                    content,
-                    isLoaded: true
-                };
-
-                // Update State
-                setNetworkItems(prev => {
-                    const newItems = prev.map(i => i.id === updatedItem.id ? updatedItem : i);
-                    
-                    // Update Cache
-                    const cacheToSave = newItems.reduce((acc, item) => {
-                        if (item.isLoaded) {
-                            acc[item.id] = item;
-                        }
-                        return acc;
-                    }, {} as any);
-                    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheToSave));
-                    
-                    return newItems;
-                });
-
-                // Remove from queue
-                setFetchQueue(prev => prev.slice(1));
-
-            } catch (error) {
-                console.error(`Error fetching ${itemToFetch.title}:`, error);
-                // Remove failed item from queue to prevent blocking
-                setFetchQueue(prev => prev.slice(1));
-            }
-        };
-
-        // Process one item every 2 seconds to be gentle
-        const timer = setTimeout(processQueue, 2000);
-        return () => clearTimeout(timer);
-    }, [fetchQueue]);
-
-    const handleItemClick = (item: any) => {
-        if (item.tool === 'COMMUNITY' && !item.isLoaded) {
-            setToastMessage("PATIENCE_IS_A_VIRTUE (DOWNLOADING...)");
-            // It's already in the queue, just wait
-        }
-        setSelectedItem(item);
-    };
-    
     // Console Art
     useEffect(() => {
         console.log(CONSOLE_ART);
     }, []);
+
+    // ... (Easter Egg Logic)
+
+    const handleItemClick = (item: any) => {
+        setSelectedItem(item);
+    };
 
     // Easter Egg Logic
     const isCatSearch = useMemo(() => {
@@ -690,7 +549,6 @@ function App() {
                     onLogoClick={handleLogoClick}
                     coffeeStatus={coffeeStatus}
                     xp={xp}
-                    isLoadingNetwork={isLoadingNetwork}
                     className="h-full shadow-2xl"
                 />
             </div>
@@ -705,7 +563,6 @@ function App() {
                 onLogoClick={handleLogoClick}
                 coffeeStatus={coffeeStatus}
                 xp={xp}
-                isLoadingNetwork={isLoadingNetwork}
                 className="hidden md:flex fixed left-0 top-0 h-screen z-20"
             />
 
