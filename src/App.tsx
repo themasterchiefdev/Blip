@@ -1,388 +1,20 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Search, Terminal, Copy, ExternalLink, Github, Check, Shuffle, Command, X, Menu, ArrowRight } from 'lucide-react';
+import { Search, Terminal, Shuffle, Command, Menu } from 'lucide-react';
 
 // --- DATA SOURCE ---
-const INITIAL_STATE = {
-  "meta": {
-    "version": "1.2",
-    "maintainer": "Open Source Community",
-    "security_warning": "DO NOT COMMIT SECRETS OR API KEYS"
-  },
-  "external_repos": [
-    {
-      "label": "Awesome Copilot",
-      "url": "https://github.com/github/awesome-copilot",
-      "icon": "Github"
-    }
-  ],
-  "items": [
-    {
-      "id": "CP-001",
-      "title": "Unit Test Generation",
-      "tool": "GitHub Copilot",
-      "category": "Utility",
-      "tags": ["Testing", "Python", "Quality"],
-      "content": "/tests Write a comprehensive pytest suite for the selected class. Include happy paths, edge cases (null/empty inputs), and mock external network calls."
-    },
-    {
-      "id": "CL-042",
-      "title": "System Architect Persona",
-      "tool": "Claude 3.5",
-      "category": "Persona",
-      "tags": ["Architecture", "Review"],
-      "content": "Act as a Principal Software Architect. Review the following code for: 1. Scalability bottlenecks, 2. Security flaws (OWASP), 3. Maintainability. Output as a markdown checklist."
-    },
-    {
-      "id": "GM-101",
-      "title": "Documentation Simplifier",
-      "tool": "Gemini",
-      "category": "Utility",
-      "tags": ["Docs", "Writing"],
-      "content": "Rewrite this technical documentation to be understood by a non-technical Product Manager. Remove jargon and use analogies."
-    },
-    {
-      "id": "CP-002",
-      "title": "ASP.NET Minimal API",
-      "tool": "GitHub Copilot",
-      "category": "Development",
-      "tags": ["ASP.NET", "API", "OpenAPI", "C#"],
-      "content": `---
-mode: 'agent'
-tools: ['changes', 'search/codebase', 'edit/editFiles', 'problems']
-description: 'Create ASP.NET Minimal API endpoints with proper OpenAPI documentation'
----
+import prompts from './data/prompts.json';
 
-# ASP.NET Minimal API with OpenAPI
-
-Your goal is to help me create well-structured ASP.NET Minimal API endpoints with correct types and comprehensive OpenAPI/Swagger documentation.
-
-## API Organization
-
-- Group related endpoints using \`MapGroup()\` extension
-- Use endpoint filters for cross-cutting concerns
-- Structure larger APIs with separate endpoint classes
-- Consider using a feature-based folder structure for complex APIs
-
-## Request and Response Types
-
-- Define explicit request and response DTOs/models
-- Create clear model classes with proper validation attributes
-- Use record types for immutable request/response objects
-- Use meaningful property names that align with API design standards
-- Apply \`[Required]\` and other validation attributes to enforce constraints
-- Use the ProblemDetailsService and StatusCodePages to get standard error responses
-
-## Type Handling
-
-- Use strongly-typed route parameters with explicit type binding
-- Use \`Results<T1, T2>\` to represent multiple response types
-- Return \`TypedResults\` instead of \`Results\` for strongly-typed responses
-- Leverage C# 10+ features like nullable annotations and init-only properties
-
-## OpenAPI Documentation
-
-- Use the built-in OpenAPI document support added in .NET 9
-- Define operation summary and description
-- Add operationIds using the \`WithName\` extension method
-- Add descriptions to properties and parameters with \`[Description()]\`
-- Set proper content types for requests and responses
-- Use document transformers to add elements like servers, tags, and security schemes
-- Use schema transformers to apply customizations to OpenAPI schemas`
-    }
-  ]
-};
-
-const CAT_MESSAGES = [
-    "COME ON BRO, YOU CAME HERE FOR AI, NOT CATS.",
-    "THE ONLY 'CAT' HERE IS 'CONCATENATE'. GET BACK TO WORK.",
-    "ERROR 418: I'M A TEAPOT, NOT A CAT VIDEO PLAYER.",
-    "LOOK, I LIKE CATS TOO, BUT WE HAVE PROMPTS TO DEPLOY.",
-    "DETECTED PROCRASTINATION ATTEMPT. DEPLOYING GUILT TRIP...",
-    "THIS IS A SERIOUS TOOL FOR SERIOUS PEOPLE (MOSTLY). NO CATS.",
-    "TRY YOUTUBE.COM. THIS IS LOCALHOST, SIR.",
-    "IF I HAD A DOLLAR FOR EVERY CAT SEARCH... I'D BUY MORE RAM.",
-    "CAT VIDEOS? IN THIS ECONOMY?",
-    "SYSTEM OVERLOAD: CUTENESS MODULE NOT INSTALLED."
-];
-
-
-
-const CONSOLE_ART = `
-  ____  _     ___ ____  
- | __ )| |   |_ _|  _ \\ 
- |  _ \\| |    | || |_) |
- | |_) | |___ | ||  __/ 
- |____/|_____|___|_|    
-                        
- STOP LOOKING AT MY CODE. IT'S SHY.
-`;
-
-const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-
-const RANKS = [
-    { threshold: 0, title: "SCRIPT_KIDDIE" },
-    { threshold: 50, title: "CONSOLE_COWBOY" },
-    { threshold: 100, title: "NETRUNNER" },
-    { threshold: 500, title: "AI_OVERLORD" }
-];
+// --- CONSTANTS ---
+import { EXTERNAL_REPOS, CAT_MESSAGES, CONSOLE_ART, KONAMI_CODE } from './constants';
 
 // --- COMPONENTS ---
+import Sidebar from './components/Sidebar';
+import DataCard from './components/DataCard';
+import Toast from './components/Toast';
+import DetailModal from './components/DetailModal';
+import LandingPage from './components/LandingPage';
 
-const IconMap = ({ name, size = 16, className = "" }: { name: string, size?: number, className?: string }) => {
-    switch (name) {
-        case 'Github': return <Github size={size} className={className} />;
-        case 'ExternalLink': return <ExternalLink size={size} className={className} />;
-        default: return <ExternalLink size={size} className={className} />;
-    }
-};
-
-const Sidebar = ({ activeFilter, setActiveFilter, externalRepos, className = "", onClose, onCoffeeClick, onLogoClick, coffeeStatus, xp }: { activeFilter: string, setActiveFilter: (f: string) => void, externalRepos: any[], className?: string, onClose?: () => void, onCoffeeClick: () => void, onLogoClick: () => void, coffeeStatus: 'CRITICAL' | 'OPTIMAL', xp: number }) => {
-    const tools = ['All', ...Array.from(new Set(INITIAL_STATE.items.map(item => item.tool)))];
-    const currentRank = RANKS.slice().reverse().find(r => xp >= r.threshold) || RANKS[0];
-    const nextRank = RANKS.find(r => r.threshold > xp);
-    const progress = nextRank ? ((xp - currentRank.threshold) / (nextRank.threshold - currentRank.threshold)) * 100 : 100;
-
-    return (
-        <aside className={`w-64 border-r-2 border-black flex flex-col h-full bg-white ${className}`}>
-            <div className="p-6 border-b-2 border-black bg-gray-50 flex justify-between items-center">
-                <div 
-                    className="border-2 border-black p-3 text-center shadow-[4px_4px_0px_#000] bg-white w-full cursor-pointer active:translate-y-1 active:shadow-none transition-all select-none"
-                    onClick={onLogoClick}
-                >
-                    <h1 className="font-black text-2xl tracking-tighter leading-none glitch-hover">BLIP</h1>
-                    <p className="text-[10px] font-mono mt-1 text-gray-500">BORING LIST [OF] INTELLIGENT PROMPTS</p>
-                </div>
-                {onClose && (
-                    <button onClick={onClose} className="md:hidden ml-4 p-1 border-2 border-transparent hover:border-black">
-                        <X size={20} />
-                    </button>
-                )}
-            </div>
-
-            <nav className="flex-1 p-4 overflow-y-auto">
-                <div className="mb-6">
-                    <h3 className="font-mono text-xs font-bold text-gray-400 mb-3 tracking-wider">CHOOSE_WEAPON</h3>
-                    <div className="space-y-2">
-                        {tools.map(tool => (
-                            <button
-                                key={tool}
-                                onClick={() => { setActiveFilter(tool); onClose?.(); }}
-                                className={`w-full text-left px-4 py-2 border-2 border-black font-mono text-sm transition-all duration-150
-                                    ${activeFilter === tool 
-                                        ? 'bg-black text-[#CCFF00] shadow-[2px_2px_0px_#CCFF00] translate-x-1 translate-y-1' 
-                                        : 'bg-white hover:bg-gray-100 shadow-[4px_4px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#000]'
-                                    }`}
-                            >
-                                {tool === 'All' ? 'EVERYTHING' : tool.toUpperCase()}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </nav>
-
-            <div className="p-4 border-t-2 border-black bg-gray-50">
-                <h3 className="font-mono text-xs font-bold text-gray-400 mb-3 tracking-wider">RABBIT_HOLES</h3>
-                <div className="space-y-2">
-                    {externalRepos.map((repo, idx) => (
-                        <a
-                            key={idx}
-                            href={repo.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 w-full px-3 py-2 border-2 border-black bg-white font-mono text-xs shadow-[3px_3px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_#000] transition-all"
-                        >
-                            <IconMap name={repo.icon} size={14} />
-                            <span className="truncate">{repo.label}</span>
-                        </a>
-                    ))}
-                    <button
-                        onClick={() => alert("I TOLD YOU NOT TO CLICK. NOW YOU HAVE TO LIVE WITH THE GUILT.")}
-                        className="flex items-center gap-2 w-full px-3 py-2 border-2 border-black bg-red-50 font-mono text-xs shadow-[3px_3px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_#000] transition-all text-red-600 font-bold"
-                    >
-                        <ExternalLink size={14} />
-                        <span>DO_NOT_CLICK</span>
-                    </button>
-                </div>
-                </div>
-
-
-            <div className="p-4 border-t-2 border-black bg-gray-50">
-                <div className="flex justify-between items-center mb-2">
-                    <span className="font-mono text-[10px] font-bold text-gray-400">RANK: {currentRank.title}</span>
-                    <span className="font-mono text-[10px] font-bold text-black">{xp} XP</span>
-                </div>
-                <div className="h-2 w-full border-2 border-black bg-white p-0.5 mb-4">
-                    <div className="h-full bg-black transition-all duration-500" style={{ width: `${progress}%` }}></div>
-                </div>
-
-                <div 
-                    className="cursor-pointer hover:bg-gray-100 transition-colors group"
-                    onClick={onCoffeeClick}
-                >
-                    <div className="flex justify-between items-center mb-2">
-                        <span className="font-mono text-[10px] font-bold text-gray-400 group-hover:text-black">COFFEE_LEVEL</span>
-                        <span className={`font-mono text-[10px] font-bold ${coffeeStatus === 'CRITICAL' ? 'text-red-500 animate-pulse' : 'text-green-600'}`}>
-                            {coffeeStatus}
-                        </span>
-                    </div>
-                    <div className="h-2 w-full border-2 border-black bg-white p-0.5">
-                        <div 
-                            className={`h-full transition-all duration-500 ${coffeeStatus === 'CRITICAL' ? 'w-[15%] bg-black' : 'w-full bg-[#CCFF00]'}`}
-                        ></div>
-                    </div>
-                </div>
-            </div>
-        </aside>
-    );
-};
-
-const DataCard = ({ item, onClick }: { item: any, onClick: () => void }) => {
-    return (
-        <div 
-            onClick={onClick}
-            className="group border-2 border-black bg-white p-5 shadow-[4px_4px_0px_#000] hover:shadow-[8px_8px_0px_#CCFF00] hover:-translate-y-1 transition-all duration-200 cursor-pointer h-full flex flex-col relative"
-        >
-            <div className="absolute top-3 right-3 border border-black px-1.5 py-0.5 bg-white text-[10px] font-mono group-hover:bg-black group-hover:text-white transition-colors">
-                {item.id}
-            </div>
-            
-            <div className="mb-4 mt-1">
-                <span className="inline-block bg-black text-white text-[10px] px-2 py-0.5 font-mono mb-2 uppercase tracking-wide">
-                    {item.tool}
-                </span>
-                <h3 className="font-bold text-xl leading-tight mb-2 group-hover:text-gray-700">{item.title}</h3>
-                <div className="flex gap-1 flex-wrap">
-                    {item.tags.map((tag: string) => (
-                        <span key={tag} className="text-[10px] font-mono text-gray-500 bg-gray-100 px-1">#{tag}</span>
-                    ))}
-                </div>
-            </div>
-
-            <p className="font-mono text-xs text-gray-600 line-clamp-3 bg-gray-50 p-3 border border-gray-200 flex-1 group-hover:border-black transition-colors">
-                {item.content}
-            </p>
-        </div>
-    );
-};
-
-const Toast = ({ message, onClose }: { message: string, onClose: () => void }) => {
-    useEffect(() => {
-        const timer = setTimeout(onClose, 2000);
-        return () => clearTimeout(timer);
-    }, [onClose]);
-
-    return (
-        <div className="fixed bottom-8 right-8 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
-            <div className="bg-black text-[#CCFF00] border-2 border-[#CCFF00] px-6 py-3 shadow-[4px_4px_0px_#CCFF00] flex items-center gap-3 font-mono font-bold">
-                <Check size={18} />
-                {message}
-            </div>
-        </div>
-    );
-};
-
-const DetailModal = ({ item, onClose, onCopy }: { item: any, onClose: () => void, onCopy: (msg: string) => void }) => {
-    const handleCopy = () => {
-        navigator.clipboard.writeText(item.content);
-        const messages = [
-            "PROMPT STOLEN (IT'S YOURS NOW)",
-            "CTRL+C, CTRL+V, PROFIT",
-            "YOINK!",
-            "KNOWLEDGE_TRANSFER_COMPLETE",
-            "PASTE IT LIKE YOU OWN IT"
-        ];
-        onCopy(messages[Math.floor(Math.random() * messages.length)]);
-    };
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
-            <div 
-                className="bg-white border-2 border-black shadow-[12px_12px_0px_#000] w-full max-w-3xl max-h-[85vh] flex flex-col relative animate-in zoom-in-95 duration-200" 
-                onClick={e => e.stopPropagation()}
-            >
-                <div className="flex justify-between items-center p-5 border-b-2 border-black bg-gray-50">
-                    <div className="flex items-center gap-4">
-                        <span className="border-2 border-black bg-[#CCFF00] px-2 py-1 font-mono font-bold text-sm shadow-[2px_2px_0px_#000]">
-                            {item.id}
-                        </span>
-                        <h2 className="font-black text-2xl tracking-tight">{item.title}</h2>
-                    </div>
-                    <button 
-                        onClick={onClose}
-                        className="group p-2 hover:bg-black hover:text-white border-2 border-transparent hover:border-black transition-all"
-                    >
-                        <X size={24} />
-                        <span className="sr-only">Close</span>
-                    </button>
-                </div>
-
-                <div className="p-8 overflow-y-auto">
-                    <div className="flex flex-wrap gap-3 mb-6">
-                        <span className="bg-black text-white px-3 py-1 font-mono text-xs font-bold uppercase">{item.tool}</span>
-                        <span className="border-2 border-black px-3 py-1 font-mono text-xs font-bold uppercase bg-white">{item.category}</span>
-                        {item.tags.map((tag: string) => (
-                            <span key={tag} className="text-gray-500 font-mono text-xs py-1">#{tag}</span>
-                        ))}
-                    </div>
-
-                    <div className="relative group">
-                        <div className="absolute -top-3 left-4 bg-white px-2 font-mono text-xs font-bold border-x border-t border-black z-10">
-                            PROMPT_CONTENT
-                        </div>
-                        <pre className="whitespace-pre-wrap bg-[#F5F5F5] p-6 border-2 border-black font-mono text-sm leading-relaxed min-h-[200px] shadow-inner">
-                            {item.content}
-                        </pre>
-                    </div>
-                </div>
-
-                <div className="p-5 border-t-2 border-black flex justify-between items-center bg-gray-50">
-                    <span className="font-mono text-xs text-gray-400 hidden sm:inline">PRESS ESC TO CLOSE</span>
-                    <button
-                        onClick={handleCopy}
-                        className="flex items-center gap-2 px-8 py-3 border-2 border-black font-bold text-sm shadow-[4px_4px_0px_#000] bg-white hover:bg-[#CCFF00] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#000] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all w-full sm:w-auto justify-center"
-                    >
-                        <Copy size={18} />
-                        STEAL THIS PROMPT
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const LandingPage = ({ onEnter }: { onEnter: () => void }) => {
-    return (
-        <div className="min-h-screen bg-black text-[#CCFF00] font-mono flex flex-col items-center justify-center p-4 relative overflow-hidden">
-            <div className="absolute inset-0 pointer-events-none opacity-20" 
-                 style={{ backgroundImage: 'linear-gradient(0deg, transparent 24%, rgba(204, 255, 0, .3) 25%, rgba(204, 255, 0, .3) 26%, transparent 27%, transparent 74%, rgba(204, 255, 0, .3) 75%, rgba(204, 255, 0, .3) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(204, 255, 0, .3) 25%, rgba(204, 255, 0, .3) 26%, transparent 27%, transparent 74%, rgba(204, 255, 0, .3) 75%, rgba(204, 255, 0, .3) 76%, transparent 77%, transparent)', backgroundSize: '50px 50px' }}>
-            </div>
-            
-            <div className="z-10 text-center max-w-2xl">
-                <div className="mb-8 border-2 border-[#CCFF00] p-8 shadow-[0_0_20px_rgba(204,255,0,0.3)] bg-black/80 backdrop-blur-sm">
-                    <h1 className="text-6xl font-black mb-2 tracking-tighter glitch-hover">BLIP</h1>
-                    <p className="text-xl mb-6 tracking-widest">BORING LIST [OF] INTELLIGENT PROMPTS</p>
-                    <div className="h-px bg-[#CCFF00] w-full mb-6"></div>
-                    <p className="mb-8 text-sm leading-relaxed">
-                        &gt; WELCOME TO THE BORING LIST OF INTELLIGENT PROMPTS.<br/>
-                        &gt; WHERE EXCITEMENT GOES TO DIE, AND EFFICIENCY IS BORN.<br/>
-                        &gt; PREPARE YOURSELF FOR SOME SERIOUSLY MUNDANE BRILLIANCE.
-                    </p>
-                    <button 
-                        onClick={onEnter}
-                        className="group relative px-8 py-4 bg-[#CCFF00] text-black font-bold text-lg hover:bg-white transition-colors w-full sm:w-auto"
-                    >
-                        <span className="flex items-center justify-center gap-2">
-                            EXPLORE_BORING_PROMPTS <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                        </span>
-                    </button>
-                </div>
-                <p className="text-[10px] opacity-50">v{INITIAL_STATE.meta.version} // SECURE_CONNECTION_ESTABLISHED</p>
-            </div>
-        </div>
-    );
-};
-
-function App() {
+const App = () => {
     const [view, setView] = useState<'landing' | 'app'>('landing');
     const [activeFilter, setActiveFilter] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
@@ -397,6 +29,9 @@ function App() {
     const [xp, setXp] = useState(0);
     const [unlockedBadges, setUnlockedBadges] = useState<string[]>([]);
     const [coffeeStatus, setCoffeeStatus] = useState<'CRITICAL' | 'OPTIMAL'>('CRITICAL');
+    
+    // Network State - Loaded from static JSON
+    const [items] = useState<any[]>(prompts);
 
     const searchInputRef = useRef<HTMLInputElement>(null);
     
@@ -406,11 +41,17 @@ function App() {
             setToastMessage(`ACHIEVEMENT UNLOCKED: ${badge}`);
         }
     };
-    
+
     // Console Art
     useEffect(() => {
         console.log(CONSOLE_ART);
     }, []);
+
+    // ... (Easter Egg Logic)
+
+    const handleItemClick = (item: any) => {
+        setSelectedItem(item);
+    };
 
     // Easter Egg Logic
     const isCatSearch = useMemo(() => {
@@ -482,11 +123,13 @@ function App() {
         setStatusText(statuses[nextIndex]);
     };
 
-    const filteredItems = INITIAL_STATE.items.filter(item => {
+    const allItems = items;
+
+    const filteredItems = allItems.filter(item => {
         const matchesFilter = activeFilter === 'All' || item.tool === activeFilter;
         const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                               item.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              item.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+                              item.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
         return matchesFilter && matchesSearch;
     });
 
@@ -508,9 +151,9 @@ function App() {
     }, [selectedItem]);
 
     const handleSurpriseMe = () => {
-        const items = INITIAL_STATE.items;
+        const items = allItems;
         const randomItem = items[Math.floor(Math.random() * items.length)];
-        setSelectedItem(randomItem);
+        handleItemClick(randomItem);
     };
 
     const handleCoffeeClick = () => {
@@ -529,7 +172,7 @@ function App() {
                 <Sidebar 
                     activeFilter={activeFilter} 
                     setActiveFilter={setActiveFilter} 
-                    externalRepos={INITIAL_STATE.external_repos}
+                    externalRepos={EXTERNAL_REPOS}
                     onClose={() => setIsMobileMenuOpen(false)}
                     onCoffeeClick={handleCoffeeClick}
                     onLogoClick={handleLogoClick}
@@ -543,7 +186,7 @@ function App() {
             <Sidebar 
                 activeFilter={activeFilter} 
                 setActiveFilter={setActiveFilter} 
-                externalRepos={INITIAL_STATE.external_repos} 
+                externalRepos={EXTERNAL_REPOS} 
                 onCoffeeClick={handleCoffeeClick}
                 onLogoClick={handleLogoClick}
                 coffeeStatus={coffeeStatus}
@@ -634,7 +277,7 @@ function App() {
                                 <DataCard 
                                     key={item.id} 
                                     item={item} 
-                                    onClick={() => setSelectedItem(item)} 
+                                    onClick={() => handleItemClick(item)} 
                                 />
                             ))}
                         </div>
