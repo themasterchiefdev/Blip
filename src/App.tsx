@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Search, Terminal, Copy, ExternalLink, Github, Check, Shuffle, Command, X, Menu, ArrowRight } from 'lucide-react';
 
 // --- DATA SOURCE ---
@@ -43,6 +43,19 @@ const INITIAL_STATE = {
   ]
 };
 
+const CAT_MESSAGES = [
+    "COME ON BRO, YOU CAME HERE FOR AI, NOT CATS.",
+    "THE ONLY 'CAT' HERE IS 'CONCATENATE'. GET BACK TO WORK.",
+    "ERROR 418: I'M A TEAPOT, NOT A CAT VIDEO PLAYER.",
+    "LOOK, I LIKE CATS TOO, BUT WE HAVE PROMPTS TO DEPLOY.",
+    "DETECTED PROCRASTINATION ATTEMPT. DEPLOYING GUILT TRIP...",
+    "THIS IS A SERIOUS TOOL FOR SERIOUS PEOPLE (MOSTLY). NO CATS.",
+    "TRY YOUTUBE.COM. THIS IS LOCALHOST, SIR.",
+    "IF I HAD A DOLLAR FOR EVERY CAT SEARCH... I'D BUY MORE RAM.",
+    "CAT VIDEOS? IN THIS ECONOMY?",
+    "SYSTEM OVERLOAD: CUTENESS MODULE NOT INSTALLED."
+];
+
 // --- COMPONENTS ---
 
 const IconMap = ({ name, size = 16, className = "" }: { name: string, size?: number, className?: string }) => {
@@ -72,7 +85,7 @@ const Sidebar = ({ activeFilter, setActiveFilter, externalRepos, className = "",
 
             <nav className="flex-1 p-4 overflow-y-auto">
                 <div className="mb-6">
-                    <h3 className="font-mono text-xs font-bold text-gray-400 mb-3 tracking-wider">FILTERS</h3>
+                    <h3 className="font-mono text-xs font-bold text-gray-400 mb-3 tracking-wider">CHOOSE_WEAPON</h3>
                     <div className="space-y-2">
                         {tools.map(tool => (
                             <button
@@ -84,7 +97,7 @@ const Sidebar = ({ activeFilter, setActiveFilter, externalRepos, className = "",
                                         : 'bg-white hover:bg-gray-100 shadow-[4px_4px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#000]'
                                     }`}
                             >
-                                {tool.toUpperCase()}
+                                {tool === 'All' ? 'EVERYTHING' : tool.toUpperCase()}
                             </button>
                         ))}
                     </div>
@@ -92,7 +105,7 @@ const Sidebar = ({ activeFilter, setActiveFilter, externalRepos, className = "",
             </nav>
 
             <div className="p-4 border-t-2 border-black bg-gray-50">
-                <h3 className="font-mono text-xs font-bold text-gray-400 mb-3 tracking-wider">EXTERNAL_LINKS</h3>
+                <h3 className="font-mono text-xs font-bold text-gray-400 mb-3 tracking-wider">RABBIT_HOLES</h3>
                 <div className="space-y-2">
                     {externalRepos.map((repo, idx) => (
                         <a
@@ -106,6 +119,17 @@ const Sidebar = ({ activeFilter, setActiveFilter, externalRepos, className = "",
                             <span className="truncate">{repo.label}</span>
                         </a>
                     ))}
+                </div>
+                </div>
+
+
+            <div className="p-4 border-t-2 border-black bg-gray-50">
+                <div className="flex justify-between items-center mb-2">
+                    <span className="font-mono text-[10px] font-bold text-gray-400">COFFEE_LEVEL</span>
+                    <span className="font-mono text-[10px] font-bold text-red-500 animate-pulse">CRITICAL</span>
+                </div>
+                <div className="h-2 w-full border-2 border-black bg-white p-0.5">
+                    <div className="h-full w-[15%] bg-black"></div>
                 </div>
             </div>
         </aside>
@@ -160,7 +184,14 @@ const Toast = ({ message, onClose }: { message: string, onClose: () => void }) =
 const DetailModal = ({ item, onClose, onCopy }: { item: any, onClose: () => void, onCopy: (msg: string) => void }) => {
     const handleCopy = () => {
         navigator.clipboard.writeText(item.content);
-        onCopy("PROMPT STOLEN (IT'S YOURS NOW)");
+        const messages = [
+            "PROMPT STOLEN (IT'S YOURS NOW)",
+            "CTRL+C, CTRL+V, PROFIT",
+            "YOINK!",
+            "KNOWLEDGE_TRANSFER_COMPLETE",
+            "PASTE IT LIKE YOU OWN IT"
+        ];
+        onCopy(messages[Math.floor(Math.random() * messages.length)]);
     };
 
     return (
@@ -260,6 +291,16 @@ function App() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isMac, setIsMac] = useState(false);
     const searchInputRef = useRef<HTMLInputElement>(null);
+    
+    // Easter Egg Logic
+    const isCatSearch = useMemo(() => {
+        const q = searchQuery.toLowerCase().trim();
+        return q === 'cat' || q === 'cats' || q.includes('cat video');
+    }, [searchQuery]);
+
+    const catMessage = useMemo(() => {
+        return CAT_MESSAGES[Math.floor(Math.random() * CAT_MESSAGES.length)];
+    }, [isCatSearch]); // Only change message when search state changes
 
     useEffect(() => {
         setIsMac(navigator.platform.toUpperCase().indexOf('MAC') >= 0);
@@ -337,7 +378,7 @@ function App() {
                         <input 
                             ref={searchInputRef}
                             type="text"
-                            placeholder="SEARCH..."
+                            placeholder="SEARCH_FOR_ANSWERS_OR_CAT_VIDEOS..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full pl-12 pr-12 py-3 md:py-4 border-2 border-black font-mono text-sm focus:outline-none focus:shadow-[4px_4px_0px_#CCFF00] transition-shadow placeholder:text-gray-300 bg-white"
@@ -354,7 +395,7 @@ function App() {
                         className="hidden sm:flex items-center gap-2 px-5 py-4 border-2 border-black font-bold text-sm shadow-[4px_4px_0px_#000] bg-white hover:bg-[#CCFF00] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#000] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all whitespace-nowrap"
                     >
                         <Shuffle size={18} />
-                        SURPRISE ME
+                        I'M FEELING LAZY
                     </button>
                     <button 
                         onClick={handleSurpriseMe}
@@ -369,16 +410,23 @@ function App() {
                     <div className="flex gap-6 whitespace-nowrap">
                         <span className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-[#CCFF00] animate-pulse"></span>
-                            ONLINE
+                            SYSTEM: MOSTLY_HARMLESS
                         </span>
-                        <span className="hidden sm:inline">SOURCE: PUBLIC</span>
-                        <span>v{INITIAL_STATE.meta.version}</span>
+                        <span className="hidden sm:inline">SOURCE: TRUST_ME_BRO</span>
+                        <span>v1.2 (BETA_FOREVER)</span>
                     </div>
                 </div>
 
                 {/* Content Grid */}
                 <div className="flex-1 p-4 md:p-8 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]">
-                    {filteredItems.length > 0 ? (
+                    {isCatSearch ? (
+                        <div className="flex flex-col items-center justify-center h-96 border-2 border-black bg-yellow-50 text-black font-mono rounded-lg p-8 text-center shadow-[8px_8px_0px_#000] animate-in zoom-in-95 duration-300">
+                            <div className="text-6xl mb-4">😿</div>
+                            <h2 className="text-2xl font-black mb-2">ACCESS_DENIED</h2>
+                            <p className="text-lg font-bold">{catMessage}</p>
+                            <p className="text-xs mt-6 text-gray-500">INCIDENT_REPORTED_TO_HR</p>
+                        </div>
+                    ) : filteredItems.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto">
                             {filteredItems.map(item => (
                                 <DataCard 
@@ -391,8 +439,8 @@ function App() {
                     ) : (
                         <div className="flex flex-col items-center justify-center h-96 border-2 border-dashed border-gray-300 text-gray-400 font-mono rounded-lg">
                             <Terminal size={64} className="mb-6 opacity-20" />
-                            <p className="text-lg">NO_DATA_FOUND</p>
-                            <p className="text-xs mt-2">TRY_ADJUSTING_FILTERS</p>
+                            <p className="text-lg">404: MOTIVATION_NOT_FOUND</p>
+                            <p className="text-xs mt-2">HAVE_YOU_TRIED_TURNING_IT_OFF_AND_ON_AGAIN?</p>
                         </div>
                     )}
                 </div>
