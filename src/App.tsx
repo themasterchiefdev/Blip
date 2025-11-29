@@ -136,8 +136,8 @@ const IconMap = ({ name, size = 16, className = "" }: { name: string, size?: num
     }
 };
 
-const Sidebar = ({ activeFilter, setActiveFilter, externalRepos, className = "", onClose, onCoffeeClick, onLogoClick, coffeeStatus, xp }: { activeFilter: string, setActiveFilter: (f: string) => void, externalRepos: any[], className?: string, onClose?: () => void, onCoffeeClick: () => void, onLogoClick: () => void, coffeeStatus: 'CRITICAL' | 'OPTIMAL', xp: number }) => {
-    const tools = ['All', ...Array.from(new Set(INITIAL_STATE.items.map(item => item.tool)))];
+const Sidebar = ({ items, activeFilter, setActiveFilter, externalRepos, className = "", onClose, onCoffeeClick, onLogoClick, coffeeStatus, xp, isLoadingNetwork }: { items: any[], activeFilter: string, setActiveFilter: (f: string) => void, externalRepos: any[], className?: string, onClose?: () => void, onCoffeeClick: () => void, onLogoClick: () => void, coffeeStatus: 'CRITICAL' | 'OPTIMAL', xp: number, isLoadingNetwork?: boolean }) => {
+    const tools = ['All', ...Array.from(new Set(items.map(item => item.tool)))];
     const currentRank = RANKS.slice().reverse().find(r => xp >= r.threshold) || RANKS[0];
     const nextRank = RANKS.find(r => r.threshold > xp);
     const progress = nextRank ? ((xp - currentRank.threshold) / (nextRank.threshold - currentRank.threshold)) * 100 : 100;
@@ -174,6 +174,7 @@ const Sidebar = ({ activeFilter, setActiveFilter, externalRepos, className = "",
                                     }`}
                             >
                                 {tool === 'All' ? 'EVERYTHING' : tool.toUpperCase()}
+                                {tool === 'COMMUNITY' && isLoadingNetwork && <span className="ml-2 animate-spin inline-block">⏳</span>}
                             </button>
                         ))}
                     </div>
@@ -397,13 +398,134 @@ function App() {
     const [xp, setXp] = useState(0);
     const [unlockedBadges, setUnlockedBadges] = useState<string[]>([]);
     const [coffeeStatus, setCoffeeStatus] = useState<'CRITICAL' | 'OPTIMAL'>('CRITICAL');
+    
+    // Network State
+    const [networkItems, setNetworkItems] = useState<any[]>([]);
+    const [isLoadingNetwork, setIsLoadingNetwork] = useState(false);
 
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const CACHE_KEY = 'BLIP_CACHE_V1';
     
     const unlockBadge = (badge: string) => {
         if (!unlockedBadges.includes(badge)) {
             setUnlockedBadges(prev => [...prev, badge]);
             setToastMessage(`ACHIEVEMENT UNLOCKED: ${badge}`);
+        }
+    };
+
+    // Load from cache and fetch list
+    useEffect(() => {
+        const initNetworkItems = async () => {
+            setIsLoadingNetwork(true);
+            try {
+                // 1. Load from cache
+                const cachedData = localStorage.getItem(CACHE_KEY);
+                const cache = cachedData ? JSON.parse(cachedData) : {};
+                
+                // 2. Fetch list from GitHub
+                const response = await fetch('https://api.github.com/repos/github/awesome-copilot/contents/prompts');
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                
+                const items: any[] = [];
+
+                data.filter((file: any) => file.name.endsWith('.prompt.md'))
+                    .forEach((file: any, index: number) => {
+                        const id = `NET-${index + 1}`;
+                        const cachedItem = cache[id];
+                        
+                        // Check if we have a valid cached version
+                        if (cachedItem && cachedItem.sha === file.sha && cachedItem.content) {
+                            items.push({
+                                ...cachedItem,
+                                isLoaded: true,
+                                download_url: file.download_url // Update URL just in case
+                            });
+                        } else {
+                            // Needs update or new
+                            items.push({
+                                id,
+                                title: file.name.replace(/-/g, ' ').replace('.prompt.md', '').replace(/\b\w/g, (l: string) => l.toUpperCase()),
+                                tool: 'COMMUNITY',
+                                category: 'External',
+                                tags: ['GitHub', 'OpenSource'],
+                                content: 'Loading content...',
+                                download_url: file.download_url,
+                                sha: file.sha,
+                                isLoaded: false
+                            });
+                        }
+                    });
+                
+                setNetworkItems(items);
+            } catch (error) {
+                console.error('Failed to init network items:', error);
+                setToastMessage("ERROR: FAILED_TO_SYNC_COMMUNITY_PROMPTS");
+                
+                // Fallback to cache if network fails
+                const cachedData = localStorage.getItem(CACHE_KEY);
+                if (cachedData) {
+                    const cache = JSON.parse(cachedData);
+                    setNetworkItems(Object.values(cache));
+                }
+            } finally {
+                setIsLoadingNetwork(false);
+            }
+        };
+
+        initNetworkItems();
+    }, []);
+
+    const fetchPromptContent = async (item: any) => {
+        if (item.isLoaded) return item;
+
+        try {
+            const response = await fetch(item.download_url);
+            const text = await response.text();
+            
+            // Extract title from first H1 if present
+            const h1Match = text.match(/^#\s+(.+)$/m);
+            const title = h1Match ? h1Match[1] : item.title;
+            
+            // Remove frontmatter if present
+            const content = text.replace(/^---[\s\S]*?---\n/, '');
+
+            const updatedItem = {
+                ...item,
+                title,
+                content,
+                isLoaded: true
+            };
+
+            setNetworkItems(prev => {
+                const newItems = prev.map(i => i.id === item.id ? updatedItem : i);
+                
+                // Update Cache
+                const cacheToSave = newItems.reduce((acc, item) => {
+                    if (item.isLoaded) {
+                        acc[item.id] = item;
+                    }
+                    return acc;
+                }, {} as any);
+                localStorage.setItem(CACHE_KEY, JSON.stringify(cacheToSave));
+                
+                return newItems;
+            });
+            return updatedItem;
+        } catch (error) {
+            console.error('Failed to fetch prompt content:', error);
+            setToastMessage("ERROR: CONNECTION_INTERRUPTED");
+            return item;
+        }
+    };
+
+    const handleItemClick = async (item: any) => {
+        if (item.tool === 'COMMUNITY' && !item.isLoaded) {
+            setSelectedItem({ ...item, content: "DOWNLOADING_KNOWLEDGE..." });
+            const loadedItem = await fetchPromptContent(item);
+            setSelectedItem(loadedItem);
+        } else {
+            setSelectedItem(item);
         }
     };
     
@@ -482,11 +604,13 @@ function App() {
         setStatusText(statuses[nextIndex]);
     };
 
-    const filteredItems = INITIAL_STATE.items.filter(item => {
+    const allItems = useMemo(() => [...INITIAL_STATE.items, ...networkItems], [networkItems]);
+
+    const filteredItems = allItems.filter(item => {
         const matchesFilter = activeFilter === 'All' || item.tool === activeFilter;
         const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                               item.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              item.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+                              item.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
         return matchesFilter && matchesSearch;
     });
 
@@ -508,9 +632,9 @@ function App() {
     }, [selectedItem]);
 
     const handleSurpriseMe = () => {
-        const items = INITIAL_STATE.items;
+        const items = allItems;
         const randomItem = items[Math.floor(Math.random() * items.length)];
-        setSelectedItem(randomItem);
+        handleItemClick(randomItem);
     };
 
     const handleCoffeeClick = () => {
@@ -527,6 +651,7 @@ function App() {
             <div className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity md:hidden ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsMobileMenuOpen(false)}></div>
             <div className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform md:hidden ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <Sidebar 
+                    items={allItems}
                     activeFilter={activeFilter} 
                     setActiveFilter={setActiveFilter} 
                     externalRepos={INITIAL_STATE.external_repos}
@@ -535,12 +660,14 @@ function App() {
                     onLogoClick={handleLogoClick}
                     coffeeStatus={coffeeStatus}
                     xp={xp}
+                    isLoadingNetwork={isLoadingNetwork}
                     className="h-full shadow-2xl"
                 />
             </div>
 
             {/* Desktop Sidebar */}
             <Sidebar 
+                items={allItems}
                 activeFilter={activeFilter} 
                 setActiveFilter={setActiveFilter} 
                 externalRepos={INITIAL_STATE.external_repos} 
@@ -548,6 +675,7 @@ function App() {
                 onLogoClick={handleLogoClick}
                 coffeeStatus={coffeeStatus}
                 xp={xp}
+                isLoadingNetwork={isLoadingNetwork}
                 className="hidden md:flex fixed left-0 top-0 h-screen z-20"
             />
 
@@ -634,7 +762,7 @@ function App() {
                                 <DataCard 
                                     key={item.id} 
                                     item={item} 
-                                    onClick={() => setSelectedItem(item)} 
+                                    onClick={() => handleItemClick(item)} 
                                 />
                             ))}
                         </div>
