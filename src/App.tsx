@@ -56,18 +56,7 @@ const CAT_MESSAGES = [
     "SYSTEM OVERLOAD: CUTENESS MODULE NOT INSTALLED."
 ];
 
-const COFFEE_MESSAGES = [
-    "CAFFEINE_LEVEL_CRITICAL: SEND_BEANS",
-    "I DON'T HAVE A PROBLEM, I HAVE A DEADLINE.",
-    "DECAF? WE DON'T DO THAT HERE.",
-    "ERROR: BLOOD_STREAM_TOO_CLEAN. INJECTING_ESPRESSO...",
-    "SLEEP IS FOR THE WEAK (AND THOSE WITHOUT BUGS).",
-    "404: SLEEP NOT FOUND.",
-    "LOADING... PLEASE INSERT COFFEE.",
-    "MY BLOOD TYPE IS ESPRESSO.",
-    "DEBUGGING: REMOVING THE NEEDLE FROM THE HAYSTACK... ONE COFFEE AT A TIME.",
-    "COMPILING... TIME FOR A REFILL."
-];
+
 
 const CONSOLE_ART = `
   ____  _     ___ ____  
@@ -81,6 +70,13 @@ const CONSOLE_ART = `
 
 const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
+const RANKS = [
+    { threshold: 0, title: "SCRIPT_KIDDIE" },
+    { threshold: 50, title: "CONSOLE_COWBOY" },
+    { threshold: 100, title: "NETRUNNER" },
+    { threshold: 500, title: "AI_OVERLORD" }
+];
+
 // --- COMPONENTS ---
 
 const IconMap = ({ name, size = 16, className = "" }: { name: string, size?: number, className?: string }) => {
@@ -91,8 +87,11 @@ const IconMap = ({ name, size = 16, className = "" }: { name: string, size?: num
     }
 };
 
-const Sidebar = ({ activeFilter, setActiveFilter, externalRepos, className = "", onClose, onCoffeeClick, onLogoClick }: { activeFilter: string, setActiveFilter: (f: string) => void, externalRepos: any[], className?: string, onClose?: () => void, onCoffeeClick: () => void, onLogoClick: () => void }) => {
+const Sidebar = ({ activeFilter, setActiveFilter, externalRepos, className = "", onClose, onCoffeeClick, onLogoClick, coffeeStatus, xp }: { activeFilter: string, setActiveFilter: (f: string) => void, externalRepos: any[], className?: string, onClose?: () => void, onCoffeeClick: () => void, onLogoClick: () => void, coffeeStatus: 'CRITICAL' | 'OPTIMAL', xp: number }) => {
     const tools = ['All', ...Array.from(new Set(INITIAL_STATE.items.map(item => item.tool)))];
+    const currentRank = RANKS.slice().reverse().find(r => xp >= r.threshold) || RANKS[0];
+    const nextRank = RANKS.find(r => r.threshold > xp);
+    const progress = nextRank ? ((xp - currentRank.threshold) / (nextRank.threshold - currentRank.threshold)) * 100 : 100;
 
     return (
         <aside className={`w-64 border-r-2 border-black flex flex-col h-full bg-white ${className}`}>
@@ -158,16 +157,30 @@ const Sidebar = ({ activeFilter, setActiveFilter, externalRepos, className = "",
                 </div>
 
 
-            <div 
-                className="p-4 border-t-2 border-black bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors group"
-                onClick={onCoffeeClick}
-            >
+            <div className="p-4 border-t-2 border-black bg-gray-50">
                 <div className="flex justify-between items-center mb-2">
-                    <span className="font-mono text-[10px] font-bold text-gray-400 group-hover:text-black">COFFEE_LEVEL</span>
-                    <span className="font-mono text-[10px] font-bold text-red-500 animate-pulse">CRITICAL</span>
+                    <span className="font-mono text-[10px] font-bold text-gray-400">RANK: {currentRank.title}</span>
+                    <span className="font-mono text-[10px] font-bold text-black">{xp} XP</span>
                 </div>
-                <div className="h-2 w-full border-2 border-black bg-white p-0.5">
-                    <div className="h-full w-[15%] bg-black group-hover:w-[20%] transition-all duration-500"></div>
+                <div className="h-2 w-full border-2 border-black bg-white p-0.5 mb-4">
+                    <div className="h-full bg-black transition-all duration-500" style={{ width: `${progress}%` }}></div>
+                </div>
+
+                <div 
+                    className="cursor-pointer hover:bg-gray-100 transition-colors group"
+                    onClick={onCoffeeClick}
+                >
+                    <div className="flex justify-between items-center mb-2">
+                        <span className="font-mono text-[10px] font-bold text-gray-400 group-hover:text-black">COFFEE_LEVEL</span>
+                        <span className={`font-mono text-[10px] font-bold ${coffeeStatus === 'CRITICAL' ? 'text-red-500 animate-pulse' : 'text-green-600'}`}>
+                            {coffeeStatus}
+                        </span>
+                    </div>
+                    <div className="h-2 w-full border-2 border-black bg-white p-0.5">
+                        <div 
+                            className={`h-full transition-all duration-500 ${coffeeStatus === 'CRITICAL' ? 'w-[15%] bg-black' : 'w-full bg-[#CCFF00]'}`}
+                        ></div>
+                    </div>
                 </div>
             </div>
         </aside>
@@ -332,7 +345,18 @@ function App() {
     const [statusText, setStatusText] = useState("SYSTEM: MOSTLY_HARMLESS");
     const [konamiIndex, setKonamiIndex] = useState(0);
     const [isInverted, setIsInverted] = useState(false);
+    const [xp, setXp] = useState(0);
+    const [unlockedBadges, setUnlockedBadges] = useState<string[]>([]);
+    const [coffeeStatus, setCoffeeStatus] = useState<'CRITICAL' | 'OPTIMAL'>('CRITICAL');
+    const [showAltVersion, setShowAltVersion] = useState(false);
     const searchInputRef = useRef<HTMLInputElement>(null);
+    
+    const unlockBadge = (badge: string) => {
+        if (!unlockedBadges.includes(badge)) {
+            setUnlockedBadges(prev => [...prev, badge]);
+            setToastMessage(`ACHIEVEMENT UNLOCKED: ${badge}`);
+        }
+    };
     
     // Console Art
     useEffect(() => {
@@ -342,7 +366,9 @@ function App() {
     // Easter Egg Logic
     const isCatSearch = useMemo(() => {
         const q = searchQuery.toLowerCase().trim();
-        return q === 'cat' || q === 'cats' || q.includes('cat video');
+        const isCat = q === 'cat' || q === 'cats' || q.includes('cat video');
+        if (isCat) unlockBadge('CURIOSITY_KILLED_THE_CAT');
+        return isCat;
     }, [searchQuery]);
 
     const specialSearchMessage = useMemo(() => {
@@ -370,6 +396,7 @@ function App() {
                 if (nextIndex === KONAMI_CODE.length) {
                     setIsInverted(true);
                     setToastMessage("CHEAT_CODE_ACTIVATED: GOD_MODE_ENABLED");
+                    unlockBadge('KONAMI_MASTER');
                     setTimeout(() => setIsInverted(false), 5000);
                     setKonamiIndex(0);
                 } else {
@@ -388,6 +415,7 @@ function App() {
         setLogoClicks(newClicks);
         if (newClicks === 5) {
             setToastMessage("OUCH! STOP POKING ME.");
+            unlockBadge('RAGE_QUIT');
             setLogoClicks(0);
         }
     };
@@ -437,8 +465,7 @@ function App() {
     };
 
     const handleCoffeeClick = () => {
-        const msg = COFFEE_MESSAGES[Math.floor(Math.random() * COFFEE_MESSAGES.length)];
-        setToastMessage(msg);
+        setCoffeeStatus(prev => prev === 'CRITICAL' ? 'OPTIMAL' : 'CRITICAL');
     };
 
     if (view === 'landing') {
@@ -457,6 +484,8 @@ function App() {
                     onClose={() => setIsMobileMenuOpen(false)}
                     onCoffeeClick={handleCoffeeClick}
                     onLogoClick={handleLogoClick}
+                    coffeeStatus={coffeeStatus}
+                    xp={xp}
                     className="h-full shadow-2xl"
                 />
             </div>
@@ -468,6 +497,8 @@ function App() {
                 externalRepos={INITIAL_STATE.external_repos} 
                 onCoffeeClick={handleCoffeeClick}
                 onLogoClick={handleLogoClick}
+                coffeeStatus={coffeeStatus}
+                xp={xp}
                 className="hidden md:flex fixed left-0 top-0 h-screen z-20"
             />
 
@@ -572,7 +603,11 @@ function App() {
                 <DetailModal 
                     item={selectedItem} 
                     onClose={() => setSelectedItem(null)} 
-                    onCopy={(msg) => setToastMessage(msg)}
+                    onCopy={(msg) => {
+                        setToastMessage(msg);
+                        setXp(prev => prev + 10);
+                        unlockBadge('FIRST_BLOOD');
+                    }}
                 />
             )}
 
