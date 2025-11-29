@@ -415,16 +415,16 @@ function App() {
     };
 
     const LOADING_MESSAGES = [
-        "DOWNLOADING_KNOWLEDGE_FROM_THE_MATRIX...",
-        "CONVINCING_THE_SERVER_TO_SHARE...",
-        "DECRYPTING_ANCIENT_SCROLLS...",
-        "EXCHANGING_PACKETS_WITH_ALIENS...",
-        "LOADING... PLEASE_HOLD_YOUR_BREATH...",
-        "REVERSING_THE_POLARITY...",
-        "COMPILING_WISDOM...",
-        "ASKING_THE_ORACLE...",
-        "GENERATING_WITTY_RESPONSE...",
-        "BUFFERING_THE_INTERNET..."
+        "DOWNLOADING KNOWLEDGE...",
+        "CONVINCING SERVER...",
+        "DECRYPTING SCROLLS...",
+        "EXCHANGING PACKETS...",
+        "PLEASE WAIT...",
+        "REVERSING POLARITY...",
+        "COMPILING WISDOM...",
+        "ASKING ORACLE...",
+        "GENERATING WIT...",
+        "BUFFERING INTERNET..."
     ];
 
     // Load from cache and fetch list
