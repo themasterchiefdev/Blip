@@ -33,6 +33,8 @@ async function main() {
         let localPrompts = [];
         if (fs.existsSync(LOCAL_PROMPTS_FILE)) {
             localPrompts = JSON.parse(fs.readFileSync(LOCAL_PROMPTS_FILE, 'utf8'));
+            // Add native source to local prompts
+            localPrompts = localPrompts.map(p => ({ ...p, source: 'native' }));
             console.log(`✅ Loaded ${localPrompts.length} local prompts.`);
         } else {
             console.warn('⚠️ Local prompts file not found.');
@@ -67,6 +69,7 @@ async function main() {
                 tool: 'GitHub Copilot', // As requested by user
                 category: 'External',
                 tags: ['GitHub', 'OpenSource'],
+                source: 'awesome-copilot',
                 content: content,
                 original_url: file.html_url
             });
