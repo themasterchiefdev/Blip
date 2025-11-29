@@ -402,6 +402,7 @@ function App() {
     // Network State
     const [networkItems, setNetworkItems] = useState<any[]>([]);
     const [isLoadingNetwork, setIsLoadingNetwork] = useState(false);
+    const [fetchQueue, setFetchQueue] = useState<any[]>([]);
 
     const searchInputRef = useRef<HTMLInputElement>(null);
     const CACHE_KEY = 'BLIP_CACHE_V1';
@@ -412,6 +413,19 @@ function App() {
             setToastMessage(`ACHIEVEMENT UNLOCKED: ${badge}`);
         }
     };
+
+    const LOADING_MESSAGES = [
+        "DOWNLOADING_KNOWLEDGE_FROM_THE_MATRIX...",
+        "CONVINCING_THE_SERVER_TO_SHARE...",
+        "DECRYPTING_ANCIENT_SCROLLS...",
+        "EXCHANGING_PACKETS_WITH_ALIENS...",
+        "LOADING... PLEASE_HOLD_YOUR_BREATH...",
+        "REVERSING_THE_POLARITY...",
+        "COMPILING_WISDOM...",
+        "ASKING_THE_ORACLE...",
+        "GENERATING_WITTY_RESPONSE...",
+        "BUFFERING_THE_INTERNET..."
+    ];
 
     // Load from cache and fetch list
     useEffect(() => {
@@ -428,6 +442,7 @@ function App() {
                 const data = await response.json();
                 
                 const items: any[] = [];
+                const newQueue: any[] = [];
 
                 data.filter((file: any) => file.name.endsWith('.prompt.md'))
                     .forEach((file: any, index: number) => {
@@ -442,22 +457,25 @@ function App() {
                                 download_url: file.download_url // Update URL just in case
                             });
                         } else {
-                            // Needs update or new
-                            items.push({
+                            // Needs update
+                            const newItem = {
                                 id,
                                 title: file.name.replace(/-/g, ' ').replace('.prompt.md', '').replace(/\b\w/g, (l: string) => l.toUpperCase()),
                                 tool: 'COMMUNITY',
                                 category: 'External',
                                 tags: ['GitHub', 'OpenSource'],
-                                content: 'Loading content...',
+                                content: LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)],
                                 download_url: file.download_url,
                                 sha: file.sha,
                                 isLoaded: false
-                            });
+                            };
+                            items.push(newItem);
+                            newQueue.push(newItem);
                         }
                     });
                 
                 setNetworkItems(items);
+                setFetchQueue(newQueue);
             } catch (error) {
                 console.error('Failed to init network items:', error);
                 setToastMessage("ERROR: FAILED_TO_SYNC_COMMUNITY_PROMPTS");
@@ -476,57 +494,69 @@ function App() {
         initNetworkItems();
     }, []);
 
-    const fetchPromptContent = async (item: any) => {
-        if (item.isLoaded) return item;
+    // Background Fetch Queue Processor
+    useEffect(() => {
+        if (fetchQueue.length === 0) return;
 
-        try {
-            const response = await fetch(item.download_url);
-            const text = await response.text();
+        const processQueue = async () => {
+            const itemToFetch = fetchQueue[0];
             
-            // Extract title from first H1 if present
-            const h1Match = text.match(/^#\s+(.+)$/m);
-            const title = h1Match ? h1Match[1] : item.title;
-            
-            // Remove frontmatter if present
-            const content = text.replace(/^---[\s\S]*?---\n/, '');
-
-            const updatedItem = {
-                ...item,
-                title,
-                content,
-                isLoaded: true
-            };
-
-            setNetworkItems(prev => {
-                const newItems = prev.map(i => i.id === item.id ? updatedItem : i);
+            try {
+                const response = await fetch(itemToFetch.download_url);
+                if (!response.ok) throw new Error(`Failed to fetch ${itemToFetch.title}`);
+                const text = await response.text();
                 
-                // Update Cache
-                const cacheToSave = newItems.reduce((acc, item) => {
-                    if (item.isLoaded) {
-                        acc[item.id] = item;
-                    }
-                    return acc;
-                }, {} as any);
-                localStorage.setItem(CACHE_KEY, JSON.stringify(cacheToSave));
+                // Extract title from first H1 if present
+                const h1Match = text.match(/^#\s+(.+)$/m);
+                const title = h1Match ? h1Match[1] : itemToFetch.title;
                 
-                return newItems;
-            });
-            return updatedItem;
-        } catch (error) {
-            console.error('Failed to fetch prompt content:', error);
-            setToastMessage("ERROR: CONNECTION_INTERRUPTED");
-            return item;
-        }
-    };
+                // Remove frontmatter if present
+                const content = text.replace(/^---[\s\S]*?---\n/, '');
 
-    const handleItemClick = async (item: any) => {
+                const updatedItem = {
+                    ...itemToFetch,
+                    title,
+                    content,
+                    isLoaded: true
+                };
+
+                // Update State
+                setNetworkItems(prev => {
+                    const newItems = prev.map(i => i.id === updatedItem.id ? updatedItem : i);
+                    
+                    // Update Cache
+                    const cacheToSave = newItems.reduce((acc, item) => {
+                        if (item.isLoaded) {
+                            acc[item.id] = item;
+                        }
+                        return acc;
+                    }, {} as any);
+                    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheToSave));
+                    
+                    return newItems;
+                });
+
+                // Remove from queue
+                setFetchQueue(prev => prev.slice(1));
+
+            } catch (error) {
+                console.error(`Error fetching ${itemToFetch.title}:`, error);
+                // Remove failed item from queue to prevent blocking
+                setFetchQueue(prev => prev.slice(1));
+            }
+        };
+
+        // Process one item every 2 seconds to be gentle
+        const timer = setTimeout(processQueue, 2000);
+        return () => clearTimeout(timer);
+    }, [fetchQueue]);
+
+    const handleItemClick = (item: any) => {
         if (item.tool === 'COMMUNITY' && !item.isLoaded) {
-            setSelectedItem({ ...item, content: "DOWNLOADING_KNOWLEDGE..." });
-            const loadedItem = await fetchPromptContent(item);
-            setSelectedItem(loadedItem);
-        } else {
-            setSelectedItem(item);
+            setToastMessage("PATIENCE_IS_A_VIRTUE (DOWNLOADING...)");
+            // It's already in the queue, just wait
         }
+        setSelectedItem(item);
     };
     
     // Console Art
