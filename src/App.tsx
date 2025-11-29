@@ -165,7 +165,7 @@ const Toast = ({ message, onClose }: { message: string, onClose: () => void }) =
 const DetailModal = ({ item, onClose, onCopy }: { item: any, onClose: () => void, onCopy: (msg: string) => void }) => {
     const handleCopy = () => {
         navigator.clipboard.writeText(item.content);
-        onCopy("PAYLOAD_COPIED_TO_CLIPBOARD");
+        onCopy("PROMPT STOLEN (IT'S YOURS NOW)");
     };
 
     return (
@@ -216,7 +216,7 @@ const DetailModal = ({ item, onClose, onCopy }: { item: any, onClose: () => void
                         className="flex items-center gap-2 px-8 py-3 border-2 border-black font-bold text-sm shadow-[4px_4px_0px_#000] bg-white hover:bg-[#CCFF00] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#000] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all w-full sm:w-auto justify-center"
                     >
                         <Copy size={18} />
-                        COPY PAYLOAD
+                        STEAL THIS PROMPT
                     </button>
                 </div>
             </div>
@@ -373,10 +373,6 @@ function App() {
                         </span>
                         <span className="hidden sm:inline">SOURCE: PUBLIC</span>
                         <span>v{INITIAL_STATE.meta.version}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-white whitespace-nowrap ml-4">
-                        <ShieldAlert size={12} />
-                        <span className="hidden sm:inline">SECRETS: 0</span>
                     </div>
                 </div>
 
