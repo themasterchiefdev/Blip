@@ -56,6 +56,31 @@ const CAT_MESSAGES = [
     "SYSTEM OVERLOAD: CUTENESS MODULE NOT INSTALLED."
 ];
 
+const COFFEE_MESSAGES = [
+    "CAFFEINE_LEVEL_CRITICAL: SEND_BEANS",
+    "I DON'T HAVE A PROBLEM, I HAVE A DEADLINE.",
+    "DECAF? WE DON'T DO THAT HERE.",
+    "ERROR: BLOOD_STREAM_TOO_CLEAN. INJECTING_ESPRESSO...",
+    "SLEEP IS FOR THE WEAK (AND THOSE WITHOUT BUGS).",
+    "404: SLEEP NOT FOUND.",
+    "LOADING... PLEASE INSERT COFFEE.",
+    "MY BLOOD TYPE IS ESPRESSO.",
+    "DEBUGGING: REMOVING THE NEEDLE FROM THE HAYSTACK... ONE COFFEE AT A TIME.",
+    "COMPILING... TIME FOR A REFILL."
+];
+
+const CONSOLE_ART = `
+  ____  _     ___ ____  
+ | __ )| |   |_ _|  _ \\ 
+ |  _ \\| |    | || |_) |
+ | |_) | |___ | ||  __/ 
+ |____/|_____|___|_|    
+                        
+ STOP LOOKING AT MY CODE. IT'S SHY.
+`;
+
+const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+
 // --- COMPONENTS ---
 
 const IconMap = ({ name, size = 16, className = "" }: { name: string, size?: number, className?: string }) => {
@@ -66,14 +91,17 @@ const IconMap = ({ name, size = 16, className = "" }: { name: string, size?: num
     }
 };
 
-const Sidebar = ({ activeFilter, setActiveFilter, externalRepos, className = "", onClose }: { activeFilter: string, setActiveFilter: (f: string) => void, externalRepos: any[], className?: string, onClose?: () => void }) => {
+const Sidebar = ({ activeFilter, setActiveFilter, externalRepos, className = "", onClose, onCoffeeClick, onLogoClick }: { activeFilter: string, setActiveFilter: (f: string) => void, externalRepos: any[], className?: string, onClose?: () => void, onCoffeeClick: () => void, onLogoClick: () => void }) => {
     const tools = ['All', ...Array.from(new Set(INITIAL_STATE.items.map(item => item.tool)))];
 
     return (
         <aside className={`w-64 border-r-2 border-black flex flex-col h-full bg-white ${className}`}>
             <div className="p-6 border-b-2 border-black bg-gray-50 flex justify-between items-center">
-                <div className="border-2 border-black p-3 text-center shadow-[4px_4px_0px_#000] bg-white w-full">
-                    <h1 className="font-black text-2xl tracking-tighter leading-none glitch-hover cursor-default">BLIP</h1>
+                <div 
+                    className="border-2 border-black p-3 text-center shadow-[4px_4px_0px_#000] bg-white w-full cursor-pointer active:translate-y-1 active:shadow-none transition-all select-none"
+                    onClick={onLogoClick}
+                >
+                    <h1 className="font-black text-2xl tracking-tighter leading-none glitch-hover">BLIP</h1>
                     <p className="text-[10px] font-mono mt-1 text-gray-500">BORING LIST [OF] INTELLIGENT PROMPTS</p>
                 </div>
                 {onClose && (
@@ -119,17 +147,27 @@ const Sidebar = ({ activeFilter, setActiveFilter, externalRepos, className = "",
                             <span className="truncate">{repo.label}</span>
                         </a>
                     ))}
+                    <button
+                        onClick={() => alert("I TOLD YOU NOT TO CLICK. NOW YOU HAVE TO LIVE WITH THE GUILT.")}
+                        className="flex items-center gap-2 w-full px-3 py-2 border-2 border-black bg-red-50 font-mono text-xs shadow-[3px_3px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_#000] transition-all text-red-600 font-bold"
+                    >
+                        <ExternalLink size={14} />
+                        <span>DO_NOT_CLICK</span>
+                    </button>
                 </div>
                 </div>
 
 
-            <div className="p-4 border-t-2 border-black bg-gray-50">
+            <div 
+                className="p-4 border-t-2 border-black bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors group"
+                onClick={onCoffeeClick}
+            >
                 <div className="flex justify-between items-center mb-2">
-                    <span className="font-mono text-[10px] font-bold text-gray-400">COFFEE_LEVEL</span>
+                    <span className="font-mono text-[10px] font-bold text-gray-400 group-hover:text-black">COFFEE_LEVEL</span>
                     <span className="font-mono text-[10px] font-bold text-red-500 animate-pulse">CRITICAL</span>
                 </div>
                 <div className="h-2 w-full border-2 border-black bg-white p-0.5">
-                    <div className="h-full w-[15%] bg-black"></div>
+                    <div className="h-full w-[15%] bg-black group-hover:w-[20%] transition-all duration-500"></div>
                 </div>
             </div>
         </aside>
@@ -290,21 +328,82 @@ function App() {
     const [toastMessage, setToastMessage] = useState<string | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isMac, setIsMac] = useState(false);
+    const [logoClicks, setLogoClicks] = useState(0);
+    const [statusText, setStatusText] = useState("SYSTEM: MOSTLY_HARMLESS");
+    const [konamiIndex, setKonamiIndex] = useState(0);
+    const [isInverted, setIsInverted] = useState(false);
     const searchInputRef = useRef<HTMLInputElement>(null);
     
+    // Console Art
+    useEffect(() => {
+        console.log(CONSOLE_ART);
+    }, []);
+
     // Easter Egg Logic
     const isCatSearch = useMemo(() => {
         const q = searchQuery.toLowerCase().trim();
         return q === 'cat' || q === 'cats' || q.includes('cat video');
     }, [searchQuery]);
 
+    const specialSearchMessage = useMemo(() => {
+        const q = searchQuery.toLowerCase().trim();
+        if (q === 'recursion') return "DID YOU MEAN: RECURSION?";
+        if (q === 'sudo') return "USER_NOT_IN_SUDOERS_FILE. INCIDENT_REPORTED.";
+        if (q === '42') return "ANSWER_FOUND. QUESTION_MISSING.";
+        if (q === 'rm -rf') return "NICE TRY. I HAVE BACKUPS.";
+        return null;
+    }, [searchQuery]);
+
     const catMessage = useMemo(() => {
         return CAT_MESSAGES[Math.floor(Math.random() * CAT_MESSAGES.length)];
-    }, [isCatSearch]); // Only change message when search state changes
+    }, [isCatSearch]); 
 
     useEffect(() => {
         setIsMac(navigator.platform.toUpperCase().indexOf('MAC') >= 0);
     }, []);
+
+    // Konami Code
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === KONAMI_CODE[konamiIndex]) {
+                const nextIndex = konamiIndex + 1;
+                if (nextIndex === KONAMI_CODE.length) {
+                    setIsInverted(true);
+                    setToastMessage("CHEAT_CODE_ACTIVATED: GOD_MODE_ENABLED");
+                    setTimeout(() => setIsInverted(false), 5000);
+                    setKonamiIndex(0);
+                } else {
+                    setKonamiIndex(nextIndex);
+                }
+            } else {
+                setKonamiIndex(0);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [konamiIndex]);
+
+    const handleLogoClick = () => {
+        const newClicks = logoClicks + 1;
+        setLogoClicks(newClicks);
+        if (newClicks === 5) {
+            setToastMessage("OUCH! STOP POKING ME.");
+            setLogoClicks(0);
+        }
+    };
+
+    const handleStatusClick = () => {
+        const statuses = [
+            "SYSTEM: MOSTLY_HARMLESS",
+            "SYSTEM: BARELY_HOLDING_TOGETHER",
+            "SYSTEM: OUT_TO_LUNCH",
+            "SYSTEM: PRETENDING_TO_WORK",
+            "SYSTEM: RUNNING_ON_HOPES_AND_DREAMS"
+        ];
+        const currentIndex = statuses.indexOf(statusText);
+        const nextIndex = (currentIndex + 1) % statuses.length;
+        setStatusText(statuses[nextIndex]);
+    };
 
     const filteredItems = INITIAL_STATE.items.filter(item => {
         const matchesFilter = activeFilter === 'All' || item.tool === activeFilter;
@@ -337,12 +436,17 @@ function App() {
         setSelectedItem(randomItem);
     };
 
+    const handleCoffeeClick = () => {
+        const msg = COFFEE_MESSAGES[Math.floor(Math.random() * COFFEE_MESSAGES.length)];
+        setToastMessage(msg);
+    };
+
     if (view === 'landing') {
         return <LandingPage onEnter={() => setView('app')} />;
     }
 
     return (
-        <div className="min-h-screen bg-white text-black font-sans selection:bg-[#CCFF00] selection:text-black scanlines">
+        <div className={`min-h-screen bg-white text-black font-sans selection:bg-[#CCFF00] selection:text-black scanlines ${isInverted ? 'invert' : ''}`}>
             {/* Mobile Sidebar Drawer */}
             <div className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity md:hidden ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsMobileMenuOpen(false)}></div>
             <div className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform md:hidden ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
@@ -351,6 +455,8 @@ function App() {
                     setActiveFilter={setActiveFilter} 
                     externalRepos={INITIAL_STATE.external_repos}
                     onClose={() => setIsMobileMenuOpen(false)}
+                    onCoffeeClick={handleCoffeeClick}
+                    onLogoClick={handleLogoClick}
                     className="h-full shadow-2xl"
                 />
             </div>
@@ -360,6 +466,8 @@ function App() {
                 activeFilter={activeFilter} 
                 setActiveFilter={setActiveFilter} 
                 externalRepos={INITIAL_STATE.external_repos} 
+                onCoffeeClick={handleCoffeeClick}
+                onLogoClick={handleLogoClick}
                 className="hidden md:flex fixed left-0 top-0 h-screen z-20"
             />
 
@@ -408,12 +516,20 @@ function App() {
                 {/* Status Bar */}
                 <div className="bg-black text-[#CCFF00] px-4 md:px-6 py-2 font-mono text-[10px] tracking-wider flex justify-between items-center border-b-2 border-black overflow-x-auto">
                     <div className="flex gap-6 whitespace-nowrap">
-                        <span className="flex items-center gap-2">
+                        <span 
+                            className="flex items-center gap-2 cursor-pointer select-none hover:text-white transition-colors"
+                            onClick={handleStatusClick}
+                        >
                             <span className="w-2 h-2 rounded-full bg-[#CCFF00] animate-pulse"></span>
-                            SYSTEM: MOSTLY_HARMLESS
+                            {statusText}
                         </span>
                         <span className="hidden sm:inline">SOURCE: TRUST_ME_BRO</span>
-                        <span>v1.2 (BETA_FOREVER)</span>
+                        <span 
+                            className="cursor-pointer hover:text-white transition-colors"
+                            onClick={() => setToastMessage("RELEASE_DATE: WHEN_IT_IS_READY")}
+                        >
+                            v1.2 (BETA_FOREVER)
+                        </span>
                     </div>
                 </div>
 
@@ -425,6 +541,12 @@ function App() {
                             <h2 className="text-2xl font-black mb-2">ACCESS_DENIED</h2>
                             <p className="text-lg font-bold">{catMessage}</p>
                             <p className="text-xs mt-6 text-gray-500">INCIDENT_REPORTED_TO_HR</p>
+                        </div>
+                    ) : specialSearchMessage ? (
+                         <div className="flex flex-col items-center justify-center h-96 border-2 border-black bg-black text-[#CCFF00] font-mono rounded-lg p-8 text-center shadow-[8px_8px_0px_#CCFF00] animate-in zoom-in-95 duration-300">
+                            <Terminal size={64} className="mb-6" />
+                            <h2 className="text-2xl font-black mb-2">SYSTEM_MESSAGE</h2>
+                            <p className="text-lg font-bold">{specialSearchMessage}</p>
                         </div>
                     ) : filteredItems.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto">
