@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, Terminal, Copy, ExternalLink, Github, ShieldAlert, Check, Shuffle, Command, X, Menu, ArrowRight } from 'lucide-react';
+import { Search, Terminal, Copy, ExternalLink, Github, Check, Shuffle, Command, X, Menu, ArrowRight } from 'lucide-react';
 
 // --- DATA SOURCE ---
 const INITIAL_STATE = {
@@ -13,11 +13,6 @@ const INITIAL_STATE = {
       "label": "Awesome Copilot",
       "url": "https://github.com/github/awesome-copilot",
       "icon": "Github"
-    },
-    {
-      "label": "Anthropic Prompt Library",
-      "url": "https://docs.anthropic.com/claude/prompt-library",
-      "icon": "ExternalLink"
     }
   ],
   "items": [
@@ -263,7 +258,12 @@ function App() {
     const [selectedItem, setSelectedItem] = useState<any>(null);
     const [toastMessage, setToastMessage] = useState<string | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isMac, setIsMac] = useState(false);
     const searchInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        setIsMac(navigator.platform.toUpperCase().indexOf('MAC') >= 0);
+    }, []);
 
     const filteredItems = INITIAL_STATE.items.filter(item => {
         const matchesFilter = activeFilter === 'All' || item.tool === activeFilter;
@@ -344,7 +344,7 @@ function App() {
                         />
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex gap-1 pointer-events-none">
                             <kbd className="hidden sm:inline-flex h-6 items-center gap-1 rounded border border-gray-200 bg-gray-50 px-2 font-mono text-[10px] font-medium text-gray-500">
-                                <Command size={10} />K
+                                {isMac ? <Command size={10} /> : <span className="text-[10px] font-bold">CTRL</span>} K
                             </kbd>
                         </div>
                     </div>
